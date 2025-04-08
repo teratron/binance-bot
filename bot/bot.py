@@ -58,6 +58,8 @@ class TradingBot:
         """Initialize Binance API client."""
         api_key = os.getenv("BINANCE_API_KEY")
         api_secret = os.getenv("BINANCE_API_SECRET")
+        base_url = os.getenv("BINANCE_BASE_URL")
+
 
         if self.mode == config.MODE_LIVE and (not api_key or not api_secret):
             self.logger.error("API key and secret are required for live trading")
@@ -68,7 +70,7 @@ class TradingBot:
             self.client = Spot()
             self.logger.info("Initialized Binance client in public mode")
         else:
-            self.client = Spot(key=api_key, secret=api_secret)
+            self.client = Spot(api_key=api_key, api_secret=api_secret, base_url=base_url)
             self.logger.info("Initialized Binance client with API key authentication")
 
     def fetch_historical_data(self, limit=500):
@@ -264,8 +266,17 @@ class TradingBot:
             account_info = self.client.account()
             balances = {asset["asset"]: float(asset["free"]) for asset in account_info["balances"]}
             
-            base_currency = self.trading_pair[-4:]  # e.g., USDT from BTCUSDT
-            quote_currency = self.trading_pair[:-4]  # e.g., BTC from BTCUSDT
+            # Extract base and quote currencies correctly
+            # Handle variable length trading pairs (e.g., BTCUSDT, ETHUSD, DOGEUSDT)
+            for base in ["USDT", "BUSD", "BTC", "ETH"]:
+                if self.trading_pair.endswith(base):
+                    base_currency = base
+                    quote_currency = self.trading_pair[:-len(base)]
+                    break
+            else:
+                # Default fallback if no known base currency is found
+                base_currency = self.trading_pair[-4:]
+                quote_currency = self.trading_pair[:-4]
             
             base_balance = balances.get(base_currency, 0)
             quote_balance = balances.get(quote_currency, 0)
@@ -361,7 +372,9 @@ class TradingBot:
                 # Sleep until next candle
                 if self.mode != config.MODE_BACKTEST:
                     self.logger.info("Waiting for next candle...")
-                    time.sleep(60)  # Sleep for 1 minute
+                    # Calculate sleep time based on timeframe
+                    sleep_time = self._get_sleep_time()
+                    time.sleep(sleep_time)
                 else:
                     # In backtest mode, we process all data at once
                     self.running = False
@@ -373,6 +386,36 @@ class TradingBot:
             self.logger.exception(f"An error occurred: {e}")
             self.running = False
 
+    def _get_sleep_time(self):
+        """Calculate sleep time based on timeframe.
+        
+        Returns:
+            int: Sleep time in seconds
+        """
+        # Map timeframes to seconds
+        timeframe_seconds = {
+            "1m": 60,
+            "3m": 180,
+            "5m": 300,
+            "15m": 900,
+            "30m": 1800,
+            "1h": 3600,
+            "2h": 7200,
+            "4h": 14400,
+            "6h": 21600,
+            "8h": 28800,
+            "12h": 43200,
+            "1d": 86400,
+            "3d": 259200,
+            "1w": 604800,
+        }
+        
+        # Get seconds for the current timeframe, default to 60 seconds if not found
+        seconds = timeframe_seconds.get(self.timeframe, 60)
+        
+        # Return sleep time (slightly less than the full interval to ensure we don't miss candles)
+        return max(30, seconds - 10)
+    
     def stop(self):
         """Stop the trading bot."""
         self.logger.info("Stopping trading bot")
