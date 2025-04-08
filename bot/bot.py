@@ -89,11 +89,7 @@ class TradingBot:
             interval = self.timeframe
             
             # Fetch klines data
-            klines = self.client.klines(
-                symbol=self.trading_pair,
-                interval=interval,
-                limit=limit,
-            )
+            klines = self.client.klines( symbol=self.trading_pair, interval=interval, limit=limit)
             
             # Convert to DataFrame
             df = pd.DataFrame(
