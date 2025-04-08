@@ -14,7 +14,7 @@ from datetime import datetime
 
 import pandas as pd
 from binance.spot import Spot
-from dotenv import load_dotenv
+from dotenv_vault import load_dotenv
 
 import config
 from bot.indicators import QQEIndicator
