@@ -25,17 +25,18 @@ TIMEFRAMES = {
     "1m": "1m",  # 1 minute
     "5m": "5m",  # 5 minutes
     "15m": "15m",  # 15 minutes
+    "30m": "30m",  # 30 minutes
     "1h": "1h",  # 1 hour
     "4h": "4h",  # 4 hours
     "1d": "1d",  # 1 day
 }
 
 # Default timeframe for analysis
-DEFAULT_TIMEFRAME = TIMEFRAMES["15m"]
+DEFAULT_TIMEFRAME = TIMEFRAMES["5m"]
 
 # Backtesting parameters
-BACKTEST_START_DATE = "2023-01-01"  # Start date for backtesting
-BACKTEST_END_DATE = "2023-12-31"  # End date for backtesting
+BACKTEST_START_DATE = "2025-01-01"  # Start date for backtesting
+BACKTEST_END_DATE = "2025-04-01"  # End date for backtesting
 
 # API request parameters
 API_RATE_LIMIT = 1200  # Maximum number of requests per minute

@@ -10,18 +10,57 @@ of the QQE trading strategy on historical Binance data.
 
 import argparse
 import json
+import logging
+from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, TypedDict, cast
 
 import config
 from bot.backtest import run_backtest
 from bot.logger import setup_logger
 
 
-def parse_arguments():
+# Define TypedDict classes for backtest results structure
+class TradeDict(TypedDict):
+    """Type definition for a trade record."""
+
+    side: str
+    entry_price: float
+    exit_price: float
+    size: float
+    entry_time: datetime
+    exit_time: datetime
+    profit_loss: float
+    profit_loss_percent: float
+
+
+class EquityPointDict(TypedDict):
+    """Type definition for an equity curve point."""
+
+    timestamp: datetime
+    equity: float
+
+
+class BacktestResultsDict(TypedDict):
+    """Type definition for backtest results."""
+
+    initial_balance: float
+    final_balance: float
+    total_return: float
+    total_return_percent: float
+    num_trades: int
+    win_rate: float
+    profit_factor: float
+    max_drawdown: float
+    max_drawdown_percent: float
+    trades: List[TradeDict]
+    equity_curve: List[EquityPointDict]
+    summary: str
+
+
+def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Backtest Runner for Binance Trading Bot"
-    )
+    parser = argparse.ArgumentParser(description="Backtest Runner for Binance Trading Bot")
     parser.add_argument(
         "--pair",
         type=str,
@@ -67,13 +106,13 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def main():
+def main() -> None:
     """Main entry point for the backtest runner."""
     # Parse command line arguments
     args = parse_arguments()
 
     # Setup logger
-    logger = setup_logger(args.log_level)
+    logger: logging.Logger = setup_logger(args.log_level)
     logger.info("Starting Backtest Runner for Binance Trading Bot with QQE Indicator")
     logger.info(
         f"Pair: {args.pair}, Timeframe: {args.timeframe}, "
@@ -83,12 +122,15 @@ def main():
 
     try:
         # Run backtest
-        results = run_backtest(
-            trading_pair=args.pair,
-            timeframe=args.timeframe,
-            start_date=args.start_date,
-            end_date=args.end_date,
-            initial_balance=args.initial_balance,
+        results: BacktestResultsDict = cast(
+            BacktestResultsDict,
+            run_backtest(
+                trading_pair=args.pair,
+                timeframe=args.timeframe,
+                start_date=args.start_date,
+                end_date=args.end_date,
+                initial_balance=args.initial_balance,
+            ),
         )
 
         # Print summary
@@ -110,10 +152,10 @@ def main():
 
         # Save results to file if specified
         if args.output:
-            output_path = Path(args.output)
+            output_path: Path = Path(args.output)
 
             # Convert datetime objects to strings for JSON serialization
-            serializable_results = results.copy()
+            serializable_results: Dict[str, Any] = results.copy()
 
             # Convert trades
             for trade in serializable_results["trades"]:

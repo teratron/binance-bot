@@ -20,12 +20,13 @@ echo This may take a few minutes...
 
 REM Install packages
 uv add binance-connector
-uv add ta-lib
 uv add numpy
 uv add pandas
-uv add python-dotenv-vault
-uv add ruff
-uv add mypy
+uv add ta-lib
+uv add https://github.com/cgohlke/talib-build/releases/download/v0.6.3/ta_lib-0.6.3-cp311-cp311-win_amd64.whl
+uv add --dev mypy
+uv add --dev python-dotenv-vault
+uv add --group lint ruff
 
 echo.
 echo Installation complete!

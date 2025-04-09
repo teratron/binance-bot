@@ -15,7 +15,7 @@ This is a trading bot for Binance that uses the QQE (Quantitative Qualitative Es
 
 ### Prerequisites
 
-- Python 3.9+
+- Python 3.11+
 - UV package manager
 - TA-Lib (requires separate installation of C library)
 

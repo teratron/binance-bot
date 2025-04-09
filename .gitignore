@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+.python-version
 build/
 develop-eggs/
 dist/
@@ -21,18 +22,31 @@ wheels/
 *.egg
 
 # Virtual Environments
-.env
 .venv
-env/
 venv/
+venv.bak/
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+pip-selfcheck.json
+.flaskenv*
+
+# Environments
+.env
+.env*
+.env.local
+.env.*.local
+env/
 ENV/
 env.bak/
-venv.bak/
-.python-version
-
-# Binance API credentials
-# Keep .env.example as a template
-.env
+!.env.development
+!.env.project
+!.env.vault
+!.env.example
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -55,7 +69,6 @@ htmlcov/
 .tox/
 
 # Distribution / packaging
-.Python
 *.manifest
 *.spec
 
