@@ -12,16 +12,23 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from typing import Optional
 
 from dotenv_vault import load_dotenv
 
-from src.bot import config
+from src.config import (
+    LOG_BACKUP_COUNT,
+    LOG_FILE,
+    LOG_FORMAT,
+    LOG_LEVEL,
+    LOG_MAX_SIZE,
+)
 
 # Load environment variables
 load_dotenv()
 
 
-def setup_logger(log_level=None):
+def setup_logger(log_level: Optional[str] = None) -> logging.Logger:
     """Set up and configure the logger.
 
     Args:
@@ -32,10 +39,10 @@ def setup_logger(log_level=None):
     """
     # Get log level from environment or config
     if log_level is None:
-        log_level = os.getenv("LOG_LEVEL", config.LOG_LEVEL)
+        log_level = os.getenv("LOG_LEVEL", LOG_LEVEL)
 
     # Create logs directory if it doesn't exist
-    log_dir = Path("logs")
+    log_dir: Path = Path("logs")
     log_dir.mkdir(exist_ok=True)
 
     # Configure logger
@@ -47,7 +54,7 @@ def setup_logger(log_level=None):
         logger.handlers.clear()
 
     # Create formatter
-    formatter = logging.Formatter(config.LOG_FORMAT)
+    formatter = logging.Formatter(LOG_FORMAT)
 
     # Create console handler
     console_handler = logging.StreamHandler()
@@ -56,9 +63,9 @@ def setup_logger(log_level=None):
 
     # Create file handler with rotation
     file_handler = RotatingFileHandler(
-        log_dir / config.LOG_FILE,
-        maxBytes=config.LOG_MAX_SIZE,
-        backupCount=config.LOG_BACKUP_COUNT,
+        log_dir / LOG_FILE,
+        maxBytes=LOG_MAX_SIZE,
+        backupCount=LOG_BACKUP_COUNT,
     )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
@@ -66,7 +73,7 @@ def setup_logger(log_level=None):
     return logger
 
 
-def get_logger():
+def get_logger() -> logging.Logger:
     """Get the logger instance.
 
     Returns:

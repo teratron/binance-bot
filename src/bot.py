@@ -13,13 +13,23 @@ import time
 from datetime import datetime
 
 import pandas as pd
+from binance.error import ServerError, WebsocketClientError
 from binance.spot import Spot
 from dotenv_vault import load_dotenv
 
-from ..logger import get_logger
-from . import config
-from .indicators import QQEIndicator
-from .utils import calculate_position_size
+from src.config import (
+    MAX_POSITION_SIZE,
+    MODE_BACKTEST,
+    MODE_LIVE,
+    MODE_PAPER,
+    QQE_FAST_PERIOD,
+    QQE_RSI_PERIOD,
+    QQE_SLOW_PERIOD,
+    QQE_SMOOTHING_PERIOD,
+)
+from src.indicators import QQEIndicator
+from src.logger import get_logger
+from src.utils import calculate_position_size
 
 # Load environment variables
 load_dotenv()
@@ -45,10 +55,10 @@ class TradingBot:
 
         # Initialize indicators
         self.qqe = QQEIndicator(
-            rsi_period=config.QQE_RSI_PERIOD,
-            smoothing_period=config.QQE_SMOOTHING_PERIOD,
-            fast_period=config.QQE_FAST_PERIOD,
-            slow_period=config.QQE_SLOW_PERIOD,
+            rsi_period=QQE_RSI_PERIOD,
+            smoothing_period=QQE_SMOOTHING_PERIOD,
+            fast_period=QQE_FAST_PERIOD,
+            slow_period=QQE_SLOW_PERIOD,
         )
 
         # Initialize Binance client
@@ -60,12 +70,12 @@ class TradingBot:
         api_secret = os.getenv("BINANCE_API_SECRET")
         base_url = os.getenv("BINANCE_BASE_URL")
 
-        if self.mode == config.MODE_LIVE and (not api_key or not api_secret):
+        if self.mode == MODE_LIVE and (not api_key or not api_secret):
             self.logger.error("API key and secret are required for live trading")
             raise ValueError("API key and secret are required for live trading")
 
         # Initialize client with or without authentication based on mode
-        if self.mode == config.MODE_BACKTEST or (not api_key or not api_secret):
+        if self.mode == MODE_BACKTEST or (not api_key or not api_secret):
             self.client = Spot()
             self.logger.info("Initialized Binance client in public mode")
         else:
@@ -82,7 +92,7 @@ class TradingBot:
             pandas.DataFrame: DataFrame with historical data.
         """
         self.logger.info(
-            f"Fetching historical data for {self.trading_pair} on {self.timeframe} timeframe"
+            "Fetching historical data for %s on %s timeframe", self.trading_pair, self.timeframe
         )
 
         try:
@@ -116,11 +126,11 @@ class TradingBot:
             for col in ["open", "high", "low", "close", "volume"]:
                 df[col] = pd.to_numeric(df[col])
 
-            self.logger.info(f"Fetched {len(df)} candles of historical data")
+            self.logger.info("Fetched %d candles of historical data", len(df))
             return df
 
         except Exception as e:
-            self.logger.error(f"Error fetching historical data: {e}")
+            self.logger.error("Error fetching historical data: %s", e)
             raise
 
     def analyze_market(self, data):
@@ -169,14 +179,14 @@ class TradingBot:
         Returns:
             dict: Trade execution details
         """
-        if self.mode == config.MODE_BACKTEST:
+        if self.mode == MODE_BACKTEST:
             return self._simulate_trade(signal, price)
-        elif self.mode == config.MODE_PAPER:
+        elif self.mode == MODE_PAPER:
             return self._paper_trade(signal, price)
-        elif self.mode == config.MODE_LIVE:
+        elif self.mode == MODE_LIVE:
             return self._live_trade(signal, price)
         else:
-            self.logger.error(f"Unknown trading mode: {self.mode}")
+            self.logger.error("Unknown trading mode: %s", self.mode)
             raise ValueError(f"Unknown trading mode: {self.mode}")
 
     def _simulate_trade(self, signal, price):
@@ -189,13 +199,13 @@ class TradingBot:
         Returns:
             dict: Trade simulation details
         """
-        self.logger.info(f"Simulating {signal} trade at price {price}")
+        self.logger.info("Simulating %s trade at price %s", signal, price)
 
         # Implement backtesting logic here
         position_size = calculate_position_size(
             balance=1000.0,  # Simulated balance
             price=price,
-            risk_percent=config.MAX_POSITION_SIZE,
+            risk_percent=MAX_POSITION_SIZE,
         )
 
         return {
@@ -216,7 +226,7 @@ class TradingBot:
         Returns:
             dict: Paper trade details
         """
-        self.logger.info(f"Paper trading: {signal} at price {price}")
+        self.logger.info("Paper trading: %s at price %s", signal, price)
 
         # Get account balance (in paper trading, we can simulate this)
         simulated_balance = 1000.0  # Simulated balance in USDT
@@ -225,7 +235,7 @@ class TradingBot:
         position_size = calculate_position_size(
             balance=simulated_balance,
             price=price,
-            risk_percent=config.MAX_POSITION_SIZE,
+            risk_percent=MAX_POSITION_SIZE,
         )
 
         # Update positions dictionary
@@ -236,7 +246,7 @@ class TradingBot:
                 "entry_time": datetime.now().isoformat(),
             }
             self.logger.info(
-                f"Opened paper position: {position_size} {self.trading_pair} at {price}"
+                "Opened paper position: %s %s at %s", position_size, self.trading_pair, price
             )
         elif signal == "sell" and self.trading_pair in self.positions:
             entry = self.positions[self.trading_pair]
@@ -244,8 +254,12 @@ class TradingBot:
             profit_loss_percent = (price - entry["entry_price"]) / entry["entry_price"] * 100
 
             self.logger.info(
-                f"Closed paper position: {entry['size']} {self.trading_pair} at {price}. "
-                f"P/L: {profit_loss:.2f} USDT ({profit_loss_percent:.2f}%)"
+                "Closed paper position: %s %s at %s. P/L: %.2f USDT (%.2f%%)",
+                entry["size"],
+                self.trading_pair,
+                price,
+                profit_loss,
+                profit_loss_percent,
             )
             del self.positions[self.trading_pair]
 
@@ -267,7 +281,7 @@ class TradingBot:
         Returns:
             dict: Live trade details
         """
-        self.logger.info(f"Live trading: {signal} signal at price {price}")
+        self.logger.info("Live trading: %s signal at price %s", signal, price)
 
         try:
             # Get account balance
@@ -293,7 +307,7 @@ class TradingBot:
             position_size = calculate_position_size(
                 balance=base_balance,
                 price=price,
-                risk_percent=config.MAX_POSITION_SIZE,
+                risk_percent=MAX_POSITION_SIZE,
             )
 
             # Execute trade
@@ -305,7 +319,7 @@ class TradingBot:
                     type="MARKET",
                     quoteOrderQty=position_size * price,  # Amount in base currency
                 )
-                self.logger.info(f"Placed buy order: {order}")
+                self.logger.info("Placed buy order: %s", order)
                 return {
                     "mode": "live",
                     "signal": signal,
@@ -322,7 +336,7 @@ class TradingBot:
                     type="MARKET",
                     quantity=quote_balance,  # Sell all available quote currency
                 )
-                self.logger.info(f"Placed sell order: {order}")
+                self.logger.info("Placed sell order: %s", order)
                 return {
                     "mode": "live",
                     "signal": signal,
@@ -333,8 +347,10 @@ class TradingBot:
                 }
             else:
                 self.logger.warning(
-                    f"Cannot execute {signal} trade: insufficient balance. "
-                    f"Base balance: {base_balance}, Quote balance: {quote_balance}"
+                    "Cannot execute %s trade: insufficient balance. Base balance: %s, Quote balance: %s",
+                    signal,
+                    base_balance,
+                    quote_balance,
                 )
                 return {
                     "mode": "live",
@@ -344,8 +360,8 @@ class TradingBot:
                     "error": "Insufficient balance",
                     "timestamp": datetime.now().isoformat(),
                 }
-        except Exception as e:
-            self.logger.error(f"Error executing live trade: {e}")
+        except (ServerError, WebsocketClientError) as e:
+            self.logger.error("Error executing live trade: %s", e)
             return {
                 "mode": "live",
                 "signal": signal,
@@ -357,7 +373,7 @@ class TradingBot:
 
     def run(self):
         """Run the trading bot."""
-        self.logger.info(f"Starting trading bot in {self.mode} mode")
+        self.logger.info("Starting trading bot in %s mode", self.mode)
         self.running = True
 
         try:
@@ -368,17 +384,19 @@ class TradingBot:
                 # Analyze market data
                 analysis = self.analyze_market(data)
                 self.logger.info(
-                    f"Market analysis: Price={analysis['close']}, "
-                    f"QQE={analysis['qqe_value']:.2f}, Trend={analysis['qqe_trend']}"
+                    "Market analysis: Price=%s, QQE=%.2f, Trend=%s",
+                    analysis["close"],
+                    analysis["qqe_value"],
+                    analysis["qqe_trend"],
                 )
 
                 # Execute trade if signal is present
                 if analysis["signal"]:
                     trade_result = self.execute_trade(analysis["signal"], analysis["close"])
-                    self.logger.info(f"Trade executed: {trade_result}")
+                    self.logger.info("Trade executed: %s", trade_result)
 
                 # Sleep until next candle
-                if self.mode != config.MODE_BACKTEST:
+                if self.mode != MODE_BACKTEST:
                     self.logger.info("Waiting for next candle...")
                     # Calculate sleep time based on timeframe
                     sleep_time = self._get_sleep_time()
@@ -388,10 +406,22 @@ class TradingBot:
                     self.running = False
 
         except KeyboardInterrupt:
+            # Handle keyboard interrupt
             self.logger.info("Bot stopped by user")
             self.running = False
-        except Exception as e:
-            self.logger.exception(f"An error occurred: {e}")
+        except (ConnectionError, TimeoutError) as e:
+            # Handle network-related errors
+            self.logger.error("Network error occurred: %s", e)
+            self.running = False
+        except ValueError as e:
+            # Handle data validation errors
+            self.logger.error("Data validation error: %s", e)
+            self.running = False
+        except RuntimeError as e:
+            # Handle runtime-specific errors
+            self.logger.error("Runtime error: %s", e)
+            self.running = False
+            self.logger.exception("An error occurred: %s", e)
             self.running = False
 
     def _get_sleep_time(self):

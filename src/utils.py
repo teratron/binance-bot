@@ -11,7 +11,7 @@ position sizing, risk management, and data processing.
 import math
 from datetime import datetime, timedelta
 
-from ..logger import get_logger
+from src.logger import get_logger
 
 
 def calculate_position_size(balance, price, risk_percent):
@@ -27,7 +27,7 @@ def calculate_position_size(balance, price, risk_percent):
     """
     logger = get_logger()
     logger.debug(
-        f"Calculating position size: balance={balance}, price={price}, risk={risk_percent}"
+        "Calculating position size: balance=%s, price=%s, risk=%s", balance, price, risk_percent
     )
 
     # Calculate the amount of base currency to risk
@@ -39,7 +39,7 @@ def calculate_position_size(balance, price, risk_percent):
     # Round down to 6 decimal places (common precision for crypto)
     position_size = math.floor(position_size * 1e6) / 1e6
 
-    logger.debug(f"Calculated position size: {position_size}")
+    logger.debug("Calculated position size: %s", position_size)
     return position_size
 
 
@@ -61,7 +61,7 @@ def calculate_stop_loss(entry_price, side, stop_loss_percent):
     else:  # sell
         stop_loss = entry_price * (1 + stop_loss_percent)
 
-    logger.debug(f"Calculated stop loss: entry={entry_price}, side={side}, stop={stop_loss}")
+    logger.debug("Calculated stop loss: entry=%s, side=%s, stop=%s", entry_price, side, stop_loss)
     return stop_loss
 
 
@@ -83,7 +83,7 @@ def calculate_take_profit(entry_price, side, take_profit_percent):
     else:  # sell
         take_profit = entry_price * (1 - take_profit_percent)
 
-    logger.debug(f"Calculated take profit: entry={entry_price}, side={side}, tp={take_profit}")
+    logger.debug("Calculated take profit: entry=%s, side=%s, tp=%s", entry_price, side, take_profit)
     return take_profit
 
 

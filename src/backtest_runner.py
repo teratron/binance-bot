@@ -15,10 +15,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, TypedDict, cast
 
-import config
-
-from ..logger import setup_logger
-from .backtest import run_backtest
+from src.backtest import run_backtest
+from src.config import (
+    BACKTEST_END_DATE,
+    BACKTEST_START_DATE,
+    DEFAULT_TIMEFRAME,
+    LOG_LEVEL,
+    TRADING_PAIRS,
+)
+from src.logger import setup_logger
 
 
 # Define TypedDict classes for backtest results structure
@@ -65,25 +70,25 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--pair",
         type=str,
-        default=config.TRADING_PAIRS[0],
+        default=TRADING_PAIRS[0],
         help="Trading pair (e.g., BTCUSDT)",
     )
     parser.add_argument(
         "--timeframe",
         type=str,
-        default=config.DEFAULT_TIMEFRAME,
+        default=DEFAULT_TIMEFRAME,
         help="Trading timeframe",
     )
     parser.add_argument(
         "--start-date",
         type=str,
-        default=config.BACKTEST_START_DATE,
+        default=BACKTEST_START_DATE,
         help="Start date for backtesting (YYYY-MM-DD)",
     )
     parser.add_argument(
         "--end-date",
         type=str,
-        default=config.BACKTEST_END_DATE,
+        default=BACKTEST_END_DATE,
         help="End date for backtesting (YYYY-MM-DD)",
     )
     parser.add_argument(
@@ -101,7 +106,7 @@ def parse_arguments() -> argparse.Namespace:
         "--log-level",
         type=str,
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-        default=config.LOG_LEVEL,
+        default=LOG_LEVEL,
         help="Logging level",
     )
     return parser.parse_args()
@@ -110,15 +115,18 @@ def parse_arguments() -> argparse.Namespace:
 def main() -> None:
     """Main entry point for the backtest runner."""
     # Parse command line arguments
-    args = parse_arguments()
+    args: argparse.Namespace = parse_arguments()
 
     # Setup logger
     logger: logging.Logger = setup_logger(args.log_level)
     logger.info("Starting Backtest Runner for Binance Trading Bot with QQE Indicator")
     logger.info(
-        f"Pair: {args.pair}, Timeframe: {args.timeframe}, "
-        f"Period: {args.start_date} to {args.end_date}, "
-        f"Initial Balance: {args.initial_balance}"
+        "Pair: %s, Timeframe: %s, Period: %s to %s, Initial Balance: %s",
+        args.pair,
+        args.timeframe,
+        args.start_date,
+        args.end_date,
+        args.initial_balance,
     )
 
     try:
@@ -156,7 +164,7 @@ def main() -> None:
             output_path: Path = Path(args.output)
 
             # Convert datetime objects to strings for JSON serialization
-            serializable_results: Dict[str, Any] = results.copy()
+            serializable_results: Dict[str, Any] = dict(results.copy())
 
             # Convert trades
             for trade in serializable_results["trades"]:
@@ -171,16 +179,16 @@ def main() -> None:
                 try:
                     json.dump(serializable_results, f, indent=2)
                 except IOError as e:
-                    logger.error(f"Error while maintaining results: {e}")
+                    logger.error("Error while maintaining results: %s", e)
                     raise
 
-            logger.info(f"Backtest results saved to {output_path}")
+            logger.info("Backtest results saved to %s", output_path)
             print(f"\nBacktest results saved to {output_path}")
 
     except KeyboardInterrupt:
         logger.info("Backtest stopped by user")
-    except Exception as e:
-        logger.exception(f"An error occurred: {e}")
+    except (ValueError, IOError, RuntimeError) as e:
+        logger.exception("An error occurred: %s", e)
     finally:
         logger.info("Backtest runner completed")
 

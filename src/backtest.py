@@ -10,13 +10,21 @@ using historical data from Binance.
 
 from datetime import datetime
 
-import config
 import pandas as pd
+from binance.error import ServerError, WebsocketClientError
 from binance.spot import Spot
 
-from ..logger import get_logger
-from .indicators import QQEIndicator
-from .utils import calculate_position_size
+from src.config import (
+    ALLOW_SHORT_SELLING,
+    MAX_POSITION_SIZE,
+    QQE_FAST_PERIOD,
+    QQE_RSI_PERIOD,
+    QQE_SLOW_PERIOD,
+    QQE_SMOOTHING_PERIOD,
+)
+from src.indicators import QQEIndicator
+from src.logger import get_logger
+from src.utils import calculate_position_size
 
 
 class Backtester:
@@ -48,15 +56,18 @@ class Backtester:
 
         # Initialize indicators
         self.qqe = QQEIndicator(
-            rsi_period=config.QQE_RSI_PERIOD,
-            smoothing_period=config.QQE_SMOOTHING_PERIOD,
-            fast_period=config.QQE_FAST_PERIOD,
-            slow_period=config.QQE_SLOW_PERIOD,
+            rsi_period=QQE_RSI_PERIOD,
+            smoothing_period=QQE_SMOOTHING_PERIOD,
+            fast_period=QQE_FAST_PERIOD,
+            slow_period=QQE_SLOW_PERIOD,
         )
 
         self.logger.info(
-            f"Initialized backtester for {trading_pair} on {timeframe} timeframe "
-            f"from {start_date} to {end_date or 'now'}"
+            "Initialized backtester for %s on %s timeframe from %s to %s",
+            trading_pair,
+            timeframe,
+            start_date,
+            end_date or "now",
         )
 
     def fetch_historical_data(self):
@@ -65,7 +76,7 @@ class Backtester:
         Returns:
             pandas.DataFrame: DataFrame with historical data.
         """
-        self.logger.info(f"Fetching historical data for {self.trading_pair}")
+        self.logger.info("Fetching historical data for %s", self.trading_pair)
 
         # Convert dates to milliseconds timestamp
         start_ts = int(self.start_date.timestamp() * 1000)
@@ -94,11 +105,12 @@ class Backtester:
                 current_ts = klines[-1][0] + 1
 
                 self.logger.debug(
-                    f"Fetched {len(klines)} candles from {datetime.fromtimestamp(klines[0][0] / 1000)}"
+                    "Fetched %d candles from %s",
+                    len(klines),
+                    datetime.fromtimestamp(klines[0][0] / 1000),
                 )
-
-            except Exception as e:
-                self.logger.error(f"Error fetching historical data: {e}")
+            except (ServerError, WebsocketClientError) as e:
+                self.logger.error("Error fetching historical data: %s", e)
                 break
 
         if not all_klines:
@@ -129,7 +141,7 @@ class Backtester:
         for col in ["open", "high", "low", "close", "volume"]:
             df[col] = pd.to_numeric(df[col])
 
-        self.logger.info(f"Fetched {len(df)} candles of historical data")
+        self.logger.info("Fetched %d candles of historical data", len(df))
         return df
 
     def run_backtest(self, data=None):
@@ -200,7 +212,7 @@ class Backtester:
                     self._close_position(current["close"], current["timestamp"])
                 elif signal == "sell" and not self.position:
                     # Open short position (if allowed)
-                    if config.ALLOW_SHORT_SELLING:
+                    if ALLOW_SHORT_SELLING:
                         self._open_position("sell", current["close"], current["timestamp"])
                 elif signal == "buy" and self.position and self.position["side"] == "sell":
                     # Close short position
@@ -212,7 +224,7 @@ class Backtester:
 
         # Calculate backtest results
         results = self._calculate_results()
-        self.logger.info(f"Backtest completed: {results['summary']}")
+        self.logger.info("Backtest completed: %s", results["summary"])
 
         return results
 
@@ -228,7 +240,7 @@ class Backtester:
         position_size = calculate_position_size(
             balance=self.balance,
             price=price,
-            risk_percent=config.MAX_POSITION_SIZE,
+            risk_percent=MAX_POSITION_SIZE,
         )
 
         # Record position
@@ -239,7 +251,7 @@ class Backtester:
             "entry_time": timestamp,
         }
 
-        self.logger.debug(f"Opened {side} position: {position_size} at {price}")
+        self.logger.debug("Opened %s position: %s at %s", side, position_size, price)
 
     def _close_position(self, price, timestamp):
         """Close an open position.
@@ -278,8 +290,12 @@ class Backtester:
         self.trades.append(trade)
 
         self.logger.debug(
-            f"Closed {self.position['side']} position: {self.position['size']} at {price}. "
-            f"P/L: {profit_loss:.2f} ({trade['profit_loss_percent']:.2f}%)"
+            "Closed %s position: %s at %s. P/L: %.2f (%.2f%%)",
+            self.position["side"],
+            self.position["size"],
+            price,
+            profit_loss,
+            trade["profit_loss_percent"],
         )
 
         # Reset position

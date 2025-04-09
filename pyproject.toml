@@ -12,11 +12,11 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "mypy",
-    "python-dotenv-vault",
+    "mypy>=1.15.0",
+    "python-dotenv-vault>=0.6.4",
 ]
 lint = [
-    "ruff",
+    "ruff>=0.11.4",
 ]
 test = []
 docs = []
@@ -41,7 +41,7 @@ fixable = ["A", "B", "C", "D", "E", "F", "I"]
 unfixable = []
 src = [
     "src",
-    "examples/src",
+    "examples",
     "tests",
 ]
 exclude = [
@@ -54,6 +54,5 @@ exclude = [
 
 [tool.ruff.isort]
 known-first-party = [
-    "bot",
-    "src.bot",
+    "src",
 ]

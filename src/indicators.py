@@ -9,9 +9,9 @@ including the QQE (Quantitative Qualitative Estimation) indicator.
 """
 
 import numpy as np
-import talib
+from talib import EMA, RSI
 
-from ..logger import get_logger
+from src.logger import get_logger
 
 
 class QQEIndicator:
@@ -53,19 +53,19 @@ class QQEIndicator:
 
         # Calculate RSI
         try:
-            df["rsi"] = talib.RSI(df["close"], timeperiod=self.rsi_period)
+            df["rsi"] = RSI(df["close"], timeperiod=self.rsi_period)
         except Exception as e:
-            self.logger.error(f"Error calculating RSI: {e}")
+            self.logger.error("Error calculating RSI: %s", e)
             raise
 
         # Calculate smoothed RSI
-        df["smoothed_rsi"] = talib.EMA(df["rsi"], timeperiod=self.smoothing_period)
+        df["smoothed_rsi"] = EMA(df["rsi"], timeperiod=self.smoothing_period)
 
         # Calculate True Range of RSI
         df["rsi_tr"] = abs(df["smoothed_rsi"].shift(1) - df["smoothed_rsi"])
 
         # Calculate ATR of RSI
-        df["rsi_atr"] = talib.EMA(df["rsi_tr"], timeperiod=self.smoothing_period)
+        df["rsi_atr"] = EMA(df["rsi_tr"], timeperiod=self.smoothing_period)
 
         # Calculate fast and slow QQE bands
         df["fast_band"] = df["rsi_atr"] * self.fast_period
@@ -171,8 +171,8 @@ class EMACrossover:
         df = data.copy()
 
         # Calculate EMAs
-        df["fast_ema"] = talib.EMA(df["close"], timeperiod=self.fast_period)
-        df["slow_ema"] = talib.EMA(df["close"], timeperiod=self.slow_period)
+        df["fast_ema"] = EMA(df["close"], timeperiod=self.fast_period)
+        df["slow_ema"] = EMA(df["close"], timeperiod=self.slow_period)
 
         # Calculate crossover signals
         df["ema_cross"] = 0
