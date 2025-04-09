@@ -11,12 +11,12 @@ including the QQE (Quantitative Qualitative Estimation) indicator.
 import numpy as np
 import talib
 
-from bot.logger import get_logger
+from src.bot.logger import get_logger
 
 
 class QQEIndicator:
     """QQE (Quantitative Qualitative Estimation) indicator implementation.
-    
+
     The QQE indicator is a modified RSI indicator that uses a smoothed ATR
     to create a dynamic, adaptive indicator that can identify trends and
     potential reversal points.
@@ -47,62 +47,66 @@ class QQEIndicator:
             pandas.DataFrame: DataFrame with QQE indicator values
         """
         self.logger.info("Calculating QQE indicator values")
-        
+
         # Make a copy of the data to avoid modifying the original
         df = data.copy()
-        
+
         # Calculate RSI
         try:
-            df['rsi'] = talib.RSI(df['close'], timeperiod=self.rsi_period)
+            df["rsi"] = talib.RSI(df["close"], timeperiod=self.rsi_period)
         except Exception as e:
             self.logger.error(f"Error calculating RSI: {e}")
             raise
-        
+
         # Calculate smoothed RSI
-        df['smoothed_rsi'] = talib.EMA(df['rsi'], timeperiod=self.smoothing_period)
-        
+        df["smoothed_rsi"] = talib.EMA(df["rsi"], timeperiod=self.smoothing_period)
+
         # Calculate True Range of RSI
-        df['rsi_tr'] = abs(df['smoothed_rsi'].shift(1) - df['smoothed_rsi'])
-        
+        df["rsi_tr"] = abs(df["smoothed_rsi"].shift(1) - df["smoothed_rsi"])
+
         # Calculate ATR of RSI
-        df['rsi_atr'] = talib.EMA(df['rsi_tr'], timeperiod=self.smoothing_period)
-        
+        df["rsi_atr"] = talib.EMA(df["rsi_tr"], timeperiod=self.smoothing_period)
+
         # Calculate fast and slow QQE bands
-        df['fast_band'] = df['rsi_atr'] * self.fast_period
-        df['slow_band'] = df['rsi_atr'] * self.slow_period
-        
+        df["fast_band"] = df["rsi_atr"] * self.fast_period
+        df["slow_band"] = df["rsi_atr"] * self.slow_period
+
         # Initialize QQE values
-        df['qqe_value'] = np.nan
-        df['long_band'] = np.nan
-        df['short_band'] = np.nan
-        
+        df["qqe_value"] = np.nan
+        df["long_band"] = np.nan
+        df["short_band"] = np.nan
+
         # Calculate QQE values using a rolling window approach
         for i in range(self.rsi_period + self.smoothing_period, len(df)):
             if i == self.rsi_period + self.smoothing_period:
                 # Initialize first value
-                df.loc[df.index[i], 'qqe_value'] = df.loc[df.index[i], 'smoothed_rsi']
-                df.loc[df.index[i], 'long_band'] = df.loc[df.index[i], 'smoothed_rsi'] - df.loc[df.index[i], 'slow_band']
-                df.loc[df.index[i], 'short_band'] = df.loc[df.index[i], 'smoothed_rsi'] + df.loc[df.index[i], 'slow_band']
+                df.loc[df.index[i], "qqe_value"] = df.loc[df.index[i], "smoothed_rsi"]
+                df.loc[df.index[i], "long_band"] = (
+                    df.loc[df.index[i], "smoothed_rsi"] - df.loc[df.index[i], "slow_band"]
+                )
+                df.loc[df.index[i], "short_band"] = (
+                    df.loc[df.index[i], "smoothed_rsi"] + df.loc[df.index[i], "slow_band"]
+                )
             else:
                 # Get previous values
-                prev_qqe = df.loc[df.index[i-1], 'qqe_value']
-                prev_long = df.loc[df.index[i-1], 'long_band']
-                prev_short = df.loc[df.index[i-1], 'short_band']
-                curr_rsi = df.loc[df.index[i], 'smoothed_rsi']
-                _fast_band = df.loc[df.index[i], 'fast_band']
-                slow_band = df.loc[df.index[i], 'slow_band']
-                
+                prev_qqe = df.loc[df.index[i - 1], "qqe_value"]
+                prev_long = df.loc[df.index[i - 1], "long_band"]
+                prev_short = df.loc[df.index[i - 1], "short_band"]
+                curr_rsi = df.loc[df.index[i], "smoothed_rsi"]
+                _fast_band = df.loc[df.index[i], "fast_band"]
+                slow_band = df.loc[df.index[i], "slow_band"]
+
                 # Calculate new long and short bands
                 if prev_qqe > prev_long and curr_rsi > prev_long:
                     new_long = max(prev_long, curr_rsi - slow_band)
                 else:
                     new_long = curr_rsi - slow_band
-                
+
                 if prev_qqe < prev_short and curr_rsi < prev_short:
                     new_short = min(prev_short, curr_rsi + slow_band)
                 else:
                     new_short = curr_rsi + slow_band
-                
+
                 # Calculate new QQE value
                 if prev_qqe > prev_short and curr_rsi > new_short:
                     new_qqe = new_short
@@ -116,20 +120,24 @@ class QQEIndicator:
                         new_qqe = new_short
                     else:
                         new_qqe = prev_qqe
-                
+
                 # Store new values
-                df.loc[df.index[i], 'qqe_value'] = new_qqe
-                df.loc[df.index[i], 'long_band'] = new_long
-                df.loc[df.index[i], 'short_band'] = new_short
-        
+                df.loc[df.index[i], "qqe_value"] = new_qqe
+                df.loc[df.index[i], "long_band"] = new_long
+                df.loc[df.index[i], "short_band"] = new_short
+
         # Calculate QQE zero line crossings
-        df['qqe_zero_cross'] = 0
-        df.loc[(df['qqe_value'] > 50) & (df['qqe_value'].shift(1) <= 50), 'qqe_zero_cross'] = 1  # Bullish cross
-        df.loc[(df['qqe_value'] < 50) & (df['qqe_value'].shift(1) >= 50), 'qqe_zero_cross'] = -1  # Bearish cross
-        
+        df["qqe_zero_cross"] = 0
+        df.loc[(df["qqe_value"] > 50) & (df["qqe_value"].shift(1) <= 50), "qqe_zero_cross"] = (
+            1  # Bullish cross
+        )
+        df.loc[
+            (df["qqe_value"] < 50) & (df["qqe_value"].shift(1) >= 50), "qqe_zero_cross"
+        ] = -1  # Bearish cross
+
         # Normalize QQE value to oscillate around zero
-        df['qqe_value'] = df['qqe_value'] - 50
-        
+        df["qqe_value"] = df["qqe_value"] - 50
+
         self.logger.info("QQE indicator calculation completed")
         return df
 
@@ -158,19 +166,27 @@ class EMACrossover:
             pandas.DataFrame: DataFrame with EMA Crossover indicator values
         """
         self.logger.info("Calculating EMA Crossover indicator values")
-        
+
         # Make a copy of the data to avoid modifying the original
         df = data.copy()
-        
+
         # Calculate EMAs
-        df['fast_ema'] = talib.EMA(df['close'], timeperiod=self.fast_period)
-        df['slow_ema'] = talib.EMA(df['close'], timeperiod=self.slow_period)
-        
+        df["fast_ema"] = talib.EMA(df["close"], timeperiod=self.fast_period)
+        df["slow_ema"] = talib.EMA(df["close"], timeperiod=self.slow_period)
+
         # Calculate crossover signals
-        df['ema_cross'] = 0
-        df.loc[(df['fast_ema'] > df['slow_ema']) & (df['fast_ema'].shift(1) <= df['slow_ema'].shift(1)), 'ema_cross'] = 1  # Bullish cross
-        df.loc[(df['fast_ema'] < df['slow_ema']) & (df['fast_ema'].shift(1) >= df['slow_ema'].shift(1)), 'ema_cross'] = -1  # Bearish cross
-        
+        df["ema_cross"] = 0
+        df.loc[
+            (df["fast_ema"] > df["slow_ema"])
+            & (df["fast_ema"].shift(1) <= df["slow_ema"].shift(1)),
+            "ema_cross",
+        ] = 1  # Bullish cross
+        df.loc[
+            (df["fast_ema"] < df["slow_ema"])
+            & (df["fast_ema"].shift(1) >= df["slow_ema"].shift(1)),
+            "ema_cross",
+        ] = -1  # Bearish cross
+
         self.logger.info("EMA Crossover calculation completed")
         return df
 
@@ -199,40 +215,40 @@ class VolumeProfile:
             dict: Dictionary with Volume Profile indicator values
         """
         self.logger.info("Calculating Volume Profile indicator values")
-        
+
         # Make a copy of the data to avoid modifying the original
         df = data.copy().tail(self.lookback_period)
-        
+
         # Calculate price range
-        price_min = df['low'].min()
-        price_max = df['high'].max()
+        price_min = df["low"].min()
+        price_max = df["high"].max()
         price_range = price_max - price_min
         bin_size = price_range / self.num_bins
-        
+
         # Create price bins
         bins = [price_min + i * bin_size for i in range(self.num_bins + 1)]
-        
+
         # Calculate volume profile
         volume_profile = {}
         for i in range(self.num_bins):
             bin_low = bins[i]
             bin_high = bins[i + 1]
             bin_mid = (bin_low + bin_high) / 2
-            
+
             # Calculate volume in this price bin
-            mask = (df['low'] <= bin_high) & (df['high'] >= bin_low)
-            bin_volume = df.loc[mask, 'volume'].sum()
-            
+            mask = (df["low"] <= bin_high) & (df["high"] >= bin_low)
+            bin_volume = df.loc[mask, "volume"].sum()
+
             volume_profile[bin_mid] = bin_volume
-        
+
         # Find point of control (price level with highest volume)
         poc_price = max(volume_profile, key=volume_profile.get)
         poc_volume = volume_profile[poc_price]
-        
+
         self.logger.info("Volume Profile calculation completed")
         return {
-            'volume_profile': volume_profile,
-            'poc_price': poc_price,
-            'poc_volume': poc_volume,
-            'price_bins': bins,
+            "volume_profile": volume_profile,
+            "poc_price": poc_price,
+            "poc_volume": poc_volume,
+            "price_bins": bins,
         }

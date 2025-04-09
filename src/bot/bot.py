@@ -17,9 +17,9 @@ import pandas as pd
 from binance.spot import Spot
 from dotenv_vault import load_dotenv
 
-from bot.indicators import QQEIndicator
-from bot.logger import get_logger
-from bot.utils import calculate_position_size
+from src.bot.indicators import QQEIndicator
+from src.bot.logger import get_logger
+from src.bot.utils import calculate_position_size
 
 # Load environment variables
 load_dotenv()

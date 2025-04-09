@@ -11,7 +11,7 @@ position sizing, risk management, and data processing.
 import math
 from datetime import datetime, timedelta
 
-from bot.logger import get_logger
+from src.bot.logger import get_logger
 
 
 def calculate_position_size(balance, price, risk_percent):

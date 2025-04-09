@@ -16,8 +16,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import config
-from bot.bot import TradingBot
-from bot.logger import setup_logger
+from src.bot.bot import TradingBot
+from src.bot.logger import setup_logger
 
 
 def parse_arguments():
