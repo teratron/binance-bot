@@ -1,5 +1,5 @@
 [project]
-name = "binance-qqe-bot"
+name = "binance-bot"
 version = "0.1.0"
 description = "Trading bot for Binance using QQE indicator"
 requires-python = ">=3.11"
@@ -16,7 +16,7 @@ dev = [
     "python-dotenv-vault",
 ]
 lint = [
-  "ruff"
+  "ruff",
 ]
 test = [
 ]

@@ -56,12 +56,12 @@ def main():
     """Main entry point for the trading bot."""
     # Parse command line arguments
     args = parse_arguments()
-    
+
     # Setup logger
     logger = setup_logger(args.log_level)
     logger.info("Starting Binance Trading Bot with QQE Indicator")
     logger.info(f"Mode: {args.mode}, Pair: {args.pair}, Timeframe: {args.timeframe}")
-    
+
     try:
         # Initialize and run the trading bot
         bot = TradingBot(

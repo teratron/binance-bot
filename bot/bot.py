@@ -60,7 +60,6 @@ class TradingBot:
         api_secret = os.getenv("BINANCE_API_SECRET")
         base_url = os.getenv("BINANCE_BASE_URL")
 
-
         if self.mode == config.MODE_LIVE and (not api_key or not api_secret):
             self.logger.error("API key and secret are required for live trading")
             raise ValueError("API key and secret are required for live trading")
@@ -82,33 +81,44 @@ class TradingBot:
         Returns:
             pandas.DataFrame: DataFrame with historical data.
         """
-        self.logger.info(f"Fetching historical data for {self.trading_pair} on {self.timeframe} timeframe")
-        
+        self.logger.info(
+            f"Fetching historical data for {self.trading_pair} on {self.timeframe} timeframe"
+        )
+
         try:
             # Convert timeframe to interval format expected by Binance API
             interval = self.timeframe
-            
+
             # Fetch klines data
-            klines = self.client.klines( symbol=self.trading_pair, interval=interval, limit=limit)
-            
+            klines = self.client.klines(symbol=self.trading_pair, interval=interval, limit=limit)
+
             # Convert to DataFrame
             df = pd.DataFrame(
                 klines,
                 columns=[
-                    "timestamp", "open", "high", "low", "close", "volume",
-                    "close_time", "quote_asset_volume", "number_of_trades",
-                    "taker_buy_base_asset_volume", "taker_buy_quote_asset_volume", "ignore"
+                    "timestamp",
+                    "open",
+                    "high",
+                    "low",
+                    "close",
+                    "volume",
+                    "close_time",
+                    "quote_asset_volume",
+                    "number_of_trades",
+                    "taker_buy_base_asset_volume",
+                    "taker_buy_quote_asset_volume",
+                    "ignore",
                 ],
             )
-            
+
             # Convert types
             df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
             for col in ["open", "high", "low", "close", "volume"]:
                 df[col] = pd.to_numeric(df[col])
-                
+
             self.logger.info(f"Fetched {len(df)} candles of historical data")
             return df
-            
+
         except Exception as e:
             self.logger.error(f"Error fetching historical data: {e}")
             raise
@@ -123,14 +133,14 @@ class TradingBot:
             dict: Analysis results and trading signals
         """
         self.logger.info("Analyzing market data")
-        
+
         # Apply QQE indicator
         qqe_data = self.qqe.calculate(data)
-        
+
         # Get the latest values
         latest = qqe_data.iloc[-1]
         previous = qqe_data.iloc[-2] if len(qqe_data) > 1 else None
-        
+
         # Generate signals
         signal = None
         if previous is not None:
@@ -140,7 +150,7 @@ class TradingBot:
             # QQE crossing below the zero line (bearish)
             elif previous["qqe_value"] > 0 and latest["qqe_value"] < 0:
                 signal = "sell"
-        
+
         return {
             "timestamp": latest.name,
             "close": data["close"].iloc[-1],
@@ -180,14 +190,14 @@ class TradingBot:
             dict: Trade simulation details
         """
         self.logger.info(f"Simulating {signal} trade at price {price}")
-        
+
         # Implement backtesting logic here
         position_size = calculate_position_size(
             balance=1000.0,  # Simulated balance
             price=price,
             risk_percent=config.MAX_POSITION_SIZE,
         )
-        
+
         return {
             "mode": "backtest",
             "signal": signal,
@@ -207,17 +217,17 @@ class TradingBot:
             dict: Paper trade details
         """
         self.logger.info(f"Paper trading: {signal} at price {price}")
-        
+
         # Get account balance (in paper trading, we can simulate this)
         simulated_balance = 1000.0  # Simulated balance in USDT
-        
+
         # Calculate position size
         position_size = calculate_position_size(
             balance=simulated_balance,
             price=price,
             risk_percent=config.MAX_POSITION_SIZE,
         )
-        
+
         # Update positions dictionary
         if signal == "buy" and self.trading_pair not in self.positions:
             self.positions[self.trading_pair] = {
@@ -225,18 +235,20 @@ class TradingBot:
                 "size": position_size,
                 "entry_time": datetime.now().isoformat(),
             }
-            self.logger.info(f"Opened paper position: {position_size} {self.trading_pair} at {price}")
+            self.logger.info(
+                f"Opened paper position: {position_size} {self.trading_pair} at {price}"
+            )
         elif signal == "sell" and self.trading_pair in self.positions:
             entry = self.positions[self.trading_pair]
             profit_loss = (price - entry["entry_price"]) * entry["size"]
             profit_loss_percent = (price - entry["entry_price"]) / entry["entry_price"] * 100
-            
+
             self.logger.info(
                 f"Closed paper position: {entry['size']} {self.trading_pair} at {price}. "
                 f"P/L: {profit_loss:.2f} USDT ({profit_loss_percent:.2f}%)"
             )
             del self.positions[self.trading_pair]
-        
+
         return {
             "mode": "paper",
             "signal": signal,
@@ -256,34 +268,34 @@ class TradingBot:
             dict: Live trade details
         """
         self.logger.info(f"Live trading: {signal} signal at price {price}")
-        
+
         try:
             # Get account balance
             account_info = self.client.account()
             balances = {asset["asset"]: float(asset["free"]) for asset in account_info["balances"]}
-            
+
             # Extract base and quote currencies correctly
             # Handle variable length trading pairs (e.g., BTCUSDT, ETHUSD, DOGEUSDT)
             for base in ["USDT", "BUSD", "BTC", "ETH"]:
                 if self.trading_pair.endswith(base):
                     base_currency = base
-                    quote_currency = self.trading_pair[:-len(base)]
+                    quote_currency = self.trading_pair[: -len(base)]
                     break
             else:
                 # Default fallback if no known base currency is found
                 base_currency = self.trading_pair[-4:]
                 quote_currency = self.trading_pair[:-4]
-            
+
             base_balance = balances.get(base_currency, 0)
             quote_balance = balances.get(quote_currency, 0)
-            
+
             # Calculate position size
             position_size = calculate_position_size(
                 balance=base_balance,
                 price=price,
                 risk_percent=config.MAX_POSITION_SIZE,
             )
-            
+
             # Execute trade
             if signal == "buy" and base_balance > 0:
                 # Place market buy order
@@ -347,24 +359,24 @@ class TradingBot:
         """Run the trading bot."""
         self.logger.info(f"Starting trading bot in {self.mode} mode")
         self.running = True
-        
+
         try:
             while self.running:
                 # Fetch latest market data
                 data = self.fetch_historical_data()
-                
+
                 # Analyze market data
                 analysis = self.analyze_market(data)
                 self.logger.info(
                     f"Market analysis: Price={analysis['close']}, "
                     f"QQE={analysis['qqe_value']:.2f}, Trend={analysis['qqe_trend']}"
                 )
-                
+
                 # Execute trade if signal is present
                 if analysis["signal"]:
                     trade_result = self.execute_trade(analysis["signal"], analysis["close"])
                     self.logger.info(f"Trade executed: {trade_result}")
-                
+
                 # Sleep until next candle
                 if self.mode != config.MODE_BACKTEST:
                     self.logger.info("Waiting for next candle...")
@@ -374,7 +386,7 @@ class TradingBot:
                 else:
                     # In backtest mode, we process all data at once
                     self.running = False
-                    
+
         except KeyboardInterrupt:
             self.logger.info("Bot stopped by user")
             self.running = False
@@ -384,7 +396,7 @@ class TradingBot:
 
     def _get_sleep_time(self):
         """Calculate sleep time based on timeframe.
-        
+
         Returns:
             int: Sleep time in seconds
         """
@@ -405,13 +417,13 @@ class TradingBot:
             "3d": 259200,
             "1w": 604800,
         }
-        
+
         # Get seconds for the current timeframe, default to 60 seconds if not found
         seconds = timeframe_seconds.get(self.timeframe, 60)
-        
+
         # Return sleep time (slightly less than the full interval to ensure we don't miss candles)
         return max(30, seconds - 10)
-    
+
     def stop(self):
         """Stop the trading bot."""
         self.logger.info("Stopping trading bot")
