@@ -1,3 +1,7 @@
-"""Bot package for Binance Trading Bot."""
+"""Binance Trading Bot package."""
 
-__version__ = "0.1.0"
+# from src.bot import config
+# from src.bot.indicators import QQEIndicator
+# from src.bot.utils import calculate_position_size
+# from src.bot.backtest import run_backtest
+from src.bot.bot import TradingBot

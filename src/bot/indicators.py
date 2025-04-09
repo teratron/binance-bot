@@ -11,7 +11,7 @@ including the QQE (Quantitative Qualitative Estimation) indicator.
 import numpy as np
 import talib
 
-from src.bot.logger import get_logger
+from ..logger import get_logger
 
 
 class QQEIndicator:

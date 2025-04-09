@@ -12,14 +12,14 @@ import os
 import time
 from datetime import datetime
 
-import config
 import pandas as pd
 from binance.spot import Spot
 from dotenv_vault import load_dotenv
 
-from src.bot.indicators import QQEIndicator
-from src.bot.logger import get_logger
-from src.bot.utils import calculate_position_size
+from . import config
+from .indicators import QQEIndicator
+from .utils import calculate_position_size
+from ..logger import get_logger
 
 # Load environment variables
 load_dotenv()
@@ -145,10 +145,10 @@ class TradingBot:
         signal = None
         if previous is not None:
             # QQE crossing above the zero line (bullish)
-            if previous["qqe_value"] < 0 and latest["qqe_value"] > 0:
+            if previous["qqe_value"] < 0 < latest["qqe_value"]:
                 signal = "buy"
             # QQE crossing below the zero line (bearish)
-            elif previous["qqe_value"] > 0 and latest["qqe_value"] < 0:
+            elif previous["qqe_value"] > 0 > latest["qqe_value"]:
                 signal = "sell"
 
         return {

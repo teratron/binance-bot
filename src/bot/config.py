@@ -56,3 +56,7 @@ MODE_LIVE = "live"  # Live trading mode
 
 # Default operation mode
 DEFAULT_MODE = MODE_PAPER
+
+# Trading strategy parameters
+ALLOW_LONG_BUYING = True
+ALLOW_SHORT_SELLING = True

@@ -1,1 +1,1 @@
-"""Binance Trading Bot package."""
+from src.logger import get_logger

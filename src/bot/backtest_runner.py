@@ -16,8 +16,8 @@ from pathlib import Path
 from typing import Any, Dict, List, TypedDict, cast
 
 import config
-from src.bot.backtest import run_backtest
-from src.bot.logger import setup_logger
+from backtest import run_backtest
+from ..logger import setup_logger
 
 
 # Define TypedDict classes for backtest results structure
@@ -166,8 +166,12 @@ def main() -> None:
             for point in serializable_results["equity_curve"]:
                 point["timestamp"] = point["timestamp"].isoformat()
 
-            with open(output_path, "w") as f:
-                json.dump(serializable_results, f, indent=2)
+            with open(output_path, "w", encoding="utf-8") as f:
+                try:
+                    json.dump(serializable_results, f, indent=2)
+                except IOError as e:
+                    logger.error(f"Error while maintaining results: {e}")
+                    raise
 
             logger.info(f"Backtest results saved to {output_path}")
             print(f"\nBacktest results saved to {output_path}")

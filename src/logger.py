@@ -13,8 +13,9 @@ import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-import config
 from dotenv_vault import load_dotenv
+
+from bot import config
 
 # Load environment variables
 load_dotenv()
