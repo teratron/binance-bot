@@ -3,7 +3,12 @@ name = "binance-bot"
 version = "0.1.0"
 description = "Trading bot for Binance"
 requires-python = ">=3.11"
-dependencies = ["binance-connector", "numpy", "pandas", "ta-lib"]
+dependencies = [
+    "binance-connector",
+    "numpy",
+    "pandas",
+    "ta-lib",
+]
 
 [dependency-groups]
 dev = [
@@ -18,7 +23,11 @@ docs = []
 
 [tool.uv]
 link-mode = "copy"
-default-groups = ["lint", "test", "docs"]
+default-groups = [
+    "lint",
+    "test",
+    "docs",
+]
 
 [tool.uv.sources]
 ta-lib = { url = "https://github.com/cgohlke/talib-build/releases/download/v0.6.3/ta_lib-0.6.3-cp311-cp311-win_amd64.whl" }
@@ -30,8 +39,21 @@ select = ["E", "F", "I"]
 ignore = ["E501", "E731"]
 fixable = ["A", "B", "C", "D", "E", "F", "I"]
 unfixable = []
-src = ["src", "examples/src", "tests"]
-exclude = [".git", ".ruff_cache", "__pycache__", "venv", ".env"]
+src = [
+    "src",
+    "examples/src",
+    "tests",
+]
+exclude = [
+    ".git",
+    ".ruff_cache",
+    "__pycache__",
+    "venv",
+    ".env",
+]
 
 [tool.ruff.isort]
-known-first-party = ["bot"]
+known-first-party = [
+    "bot",
+    "src.bot",
+]
