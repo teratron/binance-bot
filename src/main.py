@@ -16,6 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import config
+
 from src.bot.bot import TradingBot
 from src.bot.logger import setup_logger
 
