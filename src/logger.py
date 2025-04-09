@@ -15,7 +15,7 @@ from pathlib import Path
 
 from dotenv_vault import load_dotenv
 
-from bot import config
+from src.bot import config
 
 # Load environment variables
 load_dotenv()

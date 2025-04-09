@@ -10,13 +10,13 @@ using historical data from Binance.
 
 from datetime import datetime
 
+import config
 import pandas as pd
 from binance.spot import Spot
 
-from . import config
+from ..logger import get_logger
 from .indicators import QQEIndicator
 from .utils import calculate_position_size
-from ..logger import get_logger
 
 
 class Backtester:
@@ -171,11 +171,11 @@ class Backtester:
                 # Add unrealized profit/loss if in a position
                 if self.position["side"] == "buy":
                     equity += self.position["size"] * (
-                            current["close"] - self.position["entry_price"]
+                        current["close"] - self.position["entry_price"]
                     )
                 else:  # sell
                     equity += self.position["size"] * (
-                            self.position["entry_price"] - current["close"]
+                        self.position["entry_price"] - current["close"]
                     )
 
             self.equity_curve.append({"timestamp": current["timestamp"], "equity": equity})
@@ -270,9 +270,9 @@ class Backtester:
             "exit_time": timestamp,
             "profit_loss": profit_loss,
             "profit_loss_percent": (
-                                           profit_loss / (self.position["entry_price"] * self.position["size"])
-                                   )
-                                   * 100,
+                profit_loss / (self.position["entry_price"] * self.position["size"])
+            )
+            * 100,
         }
 
         self.trades.append(trade)

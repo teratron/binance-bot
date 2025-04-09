@@ -16,8 +16,9 @@ from pathlib import Path
 from typing import Any, Dict, List, TypedDict, cast
 
 import config
-from backtest import run_backtest
+
 from ..logger import setup_logger
+from .backtest import run_backtest
 
 
 # Define TypedDict classes for backtest results structure

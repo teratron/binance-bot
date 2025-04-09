@@ -15,9 +15,9 @@ from pathlib import Path
 # Add the project root to the Python path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from bot import config
-from bot import TradingBot
 from logger import setup_logger
+from src.bot import config
+from src.bot.bot import TradingBot
 
 
 def parse_arguments():
