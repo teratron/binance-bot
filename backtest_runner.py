@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Dict, List, TypedDict, cast
 
 import config
+
 from bot.backtest import run_backtest
 from bot.logger import setup_logger
 

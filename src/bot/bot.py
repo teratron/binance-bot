@@ -12,11 +12,11 @@ import os
 import time
 from datetime import datetime
 
+import config
 import pandas as pd
 from binance.spot import Spot
 from dotenv_vault import load_dotenv
 
-import config
 from bot.indicators import QQEIndicator
 from bot.logger import get_logger
 from bot.utils import calculate_position_size

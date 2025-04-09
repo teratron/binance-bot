@@ -17,7 +17,7 @@ from typing import List, Union
 def check_uv_installed() -> bool:
     """Check if UV package manager is installed."""
     try:
-        subprocess.run(["uv", "--version"], capture_output=True, check=True)
+        subprocess.run(["uv", "version"], capture_output=True, check=True)
         return True
     except (subprocess.SubprocessError, FileNotFoundError):
         return False
