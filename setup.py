@@ -71,8 +71,8 @@ def install_dependencies() -> None:
     packages: list[str | list[str]] = [
         "binance-connector",
         "ta-lib",
-        "https://github.com/cgohlke/talib-build/releases/download/v0.6.3/ta_lib-0.6.3-cp311-cp311-win_amd64.whl",
         # pylint: disable=line-too-long
+        "https://github.com/cgohlke/talib-build/releases/download/v0.6.3/ta_lib-0.6.3-cp311-cp311-win_amd64.whl",
         "numpy",
         "pandas",
         ["--dev", "python-dotenv-vault"],
