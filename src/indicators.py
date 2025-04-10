@@ -11,8 +11,6 @@ including the QQE (Quantitative Qualitative Estimation) indicator.
 import numpy as np
 from talib import EMA, RSI
 
-#from src.logger import get_logger
-
 from logger import get_logger
 
 

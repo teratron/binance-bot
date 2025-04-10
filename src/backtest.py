@@ -14,7 +14,7 @@ import pandas as pd
 from binance.error import ServerError, WebsocketClientError
 from binance.spot import Spot
 
-from src.config import (
+from config import (
     ALLOW_SHORT_SELLING,
     MAX_POSITION_SIZE,
     QQE_FAST_PERIOD,
@@ -22,9 +22,9 @@ from src.config import (
     QQE_SLOW_PERIOD,
     QQE_SMOOTHING_PERIOD,
 )
-from src.indicators import QQEIndicator
-from src.logger import get_logger
-from src.utils import calculate_position_size
+from indicators import QQEIndicator
+from logger import get_logger
+from utils import calculate_position_size
 
 
 class Backtester:
