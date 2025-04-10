@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-Utility functions for the Binance Trading Bot.
+"""Utility functions for the Binance Trading Bot.
 
 This module provides helper functions for various tasks such as
 position sizing, risk management, and data processing.
@@ -14,7 +13,7 @@ from datetime import datetime, timedelta
 from logger import get_logger
 
 
-def calculate_position_size(balance, price, risk_percent):
+def calculate_position_size(balance: float, price: float, risk_percent: float) -> float:
     """Calculate position size based on account balance and risk percentage.
 
     Args:
@@ -43,7 +42,7 @@ def calculate_position_size(balance, price, risk_percent):
     return position_size
 
 
-def calculate_stop_loss(entry_price, side, stop_loss_percent):
+def calculate_stop_loss(entry_price: float, side: str, stop_loss_percent: float) -> float:
     """Calculate stop loss price based on entry price and percentage.
 
     Args:
@@ -65,7 +64,7 @@ def calculate_stop_loss(entry_price, side, stop_loss_percent):
     return stop_loss
 
 
-def calculate_take_profit(entry_price, side, take_profit_percent):
+def calculate_take_profit(entry_price: float, side: str, take_profit_percent: float) -> float:
     """Calculate take profit price based on entry price and percentage.
 
     Args:
@@ -87,7 +86,7 @@ def calculate_take_profit(entry_price, side, take_profit_percent):
     return take_profit
 
 
-def format_number(number, precision=8):
+def format_number(number: float, precision: int = 8) -> float:
     """Format a number with specified precision.
 
     Args:
@@ -101,7 +100,7 @@ def format_number(number, precision=8):
     return math.floor(number * factor) / factor
 
 
-def get_timeframe_delta(timeframe):
+def get_timeframe_delta(timeframe: str) -> timedelta:
     """Convert timeframe string to timedelta object.
 
     Args:
@@ -125,7 +124,7 @@ def get_timeframe_delta(timeframe):
         raise ValueError(f"Unknown timeframe unit: {unit}")
 
 
-def get_next_candle_time(timeframe):
+def get_next_candle_time(timeframe: str) -> datetime:
     """Calculate the timestamp of the next candle based on the timeframe.
 
     Args:
@@ -160,7 +159,7 @@ def get_next_candle_time(timeframe):
     return next_time
 
 
-def calculate_sleep_time(timeframe):
+def calculate_sleep_time(timeframe: str) -> float:
     """Calculate sleep time until the next candle.
 
     Args:
