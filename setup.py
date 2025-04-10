@@ -11,10 +11,10 @@ It provides instructions and commands for installing dependencies.
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Union
+from typing import Any
 
 
-def get_list_commands(source: str | list[str], *args: str) -> list[str]:
+def get_list_commands(source: str | list[str], *args: str | list[str]) -> list[str]:
     """Get a list of commands."""
 
     command: list[str] = []
@@ -26,18 +26,17 @@ def get_list_commands(source: str | list[str], *args: str) -> list[str]:
         return source
     if isinstance(source, str):
         source = source.strip()
-        if source.find(" ") > -1:
+        if " " in source:
             command.extend(source.split(" "))
         else:
             command.append(source)
     return command
 
 
-def check_existing(service: str | list[str], *args: str, **kwargs) -> bool:
+def check_existing(service: str | list[str], *args: str | list[str], **kwargs: Any) -> bool:
     """Check if a service with the given name is already running."""
-
     try:
-        subprocess.run(get_list_commands(service), capture_output=True, check=True)
+        subprocess.run(get_list_commands(service, *args), **kwargs)
         return True
     except (subprocess.SubprocessError, FileNotFoundError):
         return False
@@ -45,8 +44,7 @@ def check_existing(service: str | list[str], *args: str, **kwargs) -> bool:
 
 def check_uv_installed() -> bool:
     """Check if UV package manager is installed."""
-
-    if check_existing(["uv", "version"]):
+    if check_existing(["uv", "version"], capture_output=True, check=True):
         return True
 
     match sys.platform:
@@ -70,32 +68,22 @@ def install_dependencies() -> None:
     print("Installing dependencies using UV...")
 
     # Install packages
-    packages: List[Union[str, List[str]]] = [
+    packages: list[str | list[str]] = [
         "binance-connector",
         "ta-lib",
-        # pylint: disable=line-too-long
         "https://github.com/cgohlke/talib-build/releases/download/v0.6.3/ta_lib-0.6.3-cp311-cp311-win_amd64.whl",
+        # pylint: disable=line-too-long
         "numpy",
         "pandas",
         ["--dev", "python-dotenv-vault"],
         ["--dev", "mypy"],
-        ["--group", "lint", "ruff"],
+        "--group lint ruff",
     ]
 
     try:
         for package in packages:
-            command: List[str] = ["uv", "add"]
-
-            if isinstance(package, list):
-                command.extend(package)
-            elif isinstance(package, str):
-                if package.find(" ") > -1:
-                    command.extend(package.split(" "))
-                else:
-                    command.append(package)
-
             print(f"Installing {package}...")
-            subprocess.run(command, check=True)
+            _ = check_existing(["uv", "add"], package, check=True)
 
         print("Dependencies installed successfully!")
     except subprocess.SubprocessError as e:
