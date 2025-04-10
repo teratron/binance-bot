@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo "--- post-merge ---"
+
+npx dotenv-vault@latest pull
+
+.venv/Scripts/activate
+uv lock
+uv sync
+uv self update

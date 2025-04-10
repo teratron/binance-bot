@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python .githooks/prepare-commit-msg.py "message_commit.txt"
