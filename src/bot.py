@@ -13,11 +13,11 @@ import time
 from datetime import datetime
 
 import pandas as pd
-from binance.error import ServerError, WebsocketClientError
-from binance.spot import Spot
-from dotenv_vault import load_dotenv
+from binance.error import ServerError, WebsocketClientError  # type: ignore
+from binance.spot import Spot  # type: ignore
+from dotenv_vault import load_dotenv  # type: ignore
 
-from src.config import (
+from config import (
     MAX_POSITION_SIZE,
     MODE_BACKTEST,
     MODE_LIVE,
@@ -27,16 +27,26 @@ from src.config import (
     QQE_SLOW_PERIOD,
     QQE_SMOOTHING_PERIOD,
 )
-from src.indicators import QQEIndicator
-from src.logger import get_logger
-from src.utils import calculate_position_size
+from indicators import QQEIndicator
+from logger import get_logger
+from utils import calculate_position_size
 
 # Load environment variables
 load_dotenv()
 
 
 class TradingBot:
-    """Trading bot for Binance using QQE indicator."""
+    """Trading bot for Binance using QQE indicator.
+    
+    Attributes:
+        logger: Logging instance
+        trading_pair: Trading pair symbol (e.g., BTCUSDT)
+        timeframe: Timeframe for analysis (e.g., 15m, 1h)
+        mode: Trading mode (backtest, paper, live)
+        running: Bot running status
+        positions: Dictionary tracking open positions
+        qqe: QQE indicator instance
+    """
 
     def __init__(self, trading_pair, timeframe, mode):
         """Initialize the trading bot.
@@ -347,6 +357,7 @@ class TradingBot:
                 }
             else:
                 self.logger.warning(
+                    # pylint: disable-next=line-too-long
                     "Cannot execute %s trade: insufficient balance. Base balance: %s, Quote balance: %s",
                     signal,
                     base_balance,

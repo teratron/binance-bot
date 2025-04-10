@@ -14,24 +14,26 @@ from pathlib import Path
 from typing import List, Union
 
 
-def get_list_commands(args: str | list[str]) -> list[str]:
+def get_list_commands(source: str | list[str], *args: str) -> list[str]:
     """Get a list of commands."""
 
-    if isinstance(args, list):
-        return args
-
     command: list[str] = []
-    if isinstance(args, str):
-        args = args.strip()
-        if args.find(" ") > -1:
-            command.extend(args.split(" "))
+    if args:
+        command = list(args)
+    if isinstance(source, list):
+        if args:
+            source.extend(args)
+        return source
+    if isinstance(source, str):
+        source = source.strip()
+        if source.find(" ") > -1:
+            command.extend(source.split(" "))
         else:
-            command.append(args)
-
+            command.append(source)
     return command
 
 
-def check_existing_service(service: str | list[str]) -> bool:
+def check_existing(service: str | list[str], *args: str, **kwargs) -> bool:
     """Check if a service with the given name is already running."""
 
     try:
@@ -44,7 +46,7 @@ def check_existing_service(service: str | list[str]) -> bool:
 def check_uv_installed() -> bool:
     """Check if UV package manager is installed."""
 
-    if check_existing_service(["uv", "version"]):
+    if check_existing(["uv", "version"]):
         return True
 
     match sys.platform:
@@ -52,22 +54,22 @@ def check_uv_installed() -> bool:
             command: str = (
                 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'
             )
-            return check_existing_service(command)
+            return check_existing(command)
         case "linux" | "darwin":
-            if check_existing_service("curl --version"):
-                return check_existing_service("curl -LsSf https://astral.sh/uv/install.sh | sh")
-
-            if check_existing_service("wget --version"):
-                return check_existing_service("wget -qO- https://astral.sh/uv/install.sh | sh")
+            if check_existing("curl --version"):
+                return check_existing("curl -LsSf https://astral.sh/uv/install.sh | sh")
+            if check_existing("wget --version"):
+                return check_existing("wget -qO- https://astral.sh/uv/install.sh | sh")
 
     return False
 
 
 def install_dependencies() -> None:
     """Install dependencies using UV."""
+
     print("Installing dependencies using UV...")
 
-    # Install packages directly without requirements.txt
+    # Install packages
     packages: List[Union[str, List[str]]] = [
         "binance-connector",
         "ta-lib",
@@ -83,6 +85,7 @@ def install_dependencies() -> None:
     try:
         for package in packages:
             command: List[str] = ["uv", "add"]
+
             if isinstance(package, list):
                 command.extend(package)
             elif isinstance(package, str):
@@ -102,6 +105,7 @@ def install_dependencies() -> None:
 
 def setup_environment() -> None:
     """Set up the project environment."""
+
     # Create logs directory if it doesn't exist
     logs_dir: Path = Path("logs")
     logs_dir.mkdir(exist_ok=True)
@@ -110,18 +114,21 @@ def setup_environment() -> None:
     # Create .env file from example if it doesn't exist
     env_file: Path = Path(".env")
     env_example: Path = Path(".env.example")
+
     if not env_file.exists() and env_example.exists():
         with (
             open(env_example, "r", encoding="utf-8") as example,
             open(env_file, "w", encoding="utf-8") as env,
         ):
             env.write(example.read())
+
         print("Created .env file from example")
         print("Please update the .env file with your Binance API credentials")
 
 
 def main() -> None:
     """Main function to set up the project."""
+
     print("Setting up Binance Trading Bot environment...")
 
     # Check if UV is installed

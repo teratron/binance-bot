@@ -10,12 +10,15 @@ It initializes the bot with configuration settings and starts the trading proces
 
 import argparse
 import logging
-import sys
-from pathlib import Path
-from typing import NoReturn
 
-from src.bot import TradingBot
-from src.config import (
+#import sys
+#from pathlib import Path
+# Add the project root to the Python path before any imports
+#project_root = Path(__file__).parent.parent
+#sys.path.insert(0, str(project_root))
+#if sys.path[0] == str(project_root):
+from bot import TradingBot
+from config import (
     DEFAULT_MODE,
     DEFAULT_TIMEFRAME,
     LOG_LEVEL,
@@ -24,15 +27,12 @@ from src.config import (
     MODE_PAPER,
     TRADING_PAIRS,
 )
-from src.logger import setup_logger
-
-# Add the project root to the Python path
-sys.path.insert(0, str(Path(__file__).parent))
+from logger import setup_logger
 
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description="Binance Trading Bot with QQE Indicator")
+    parser = argparse.ArgumentParser(description="Binance Trading Bot")
     parser.add_argument(
         "--mode",
         type=str,
@@ -62,7 +62,7 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main() -> NoReturn:
+def main() -> None:
     """Main entry point for the trading bot."""
     # Parse command line arguments
     args: argparse.Namespace = parse_arguments()
@@ -82,7 +82,7 @@ def main() -> NoReturn:
         bot.run()
     except KeyboardInterrupt:
         logger.info("Bot stopped by user")
-    except Exception as e:
+    except (ConnectionError, TimeoutError) as e:
         logger.exception("An error occurred: %s", e)
     finally:
         logger.info("Bot shutdown complete")

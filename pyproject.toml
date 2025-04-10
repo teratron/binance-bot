@@ -13,6 +13,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "mypy>=1.15.0",
+    "pandas-stubs>=2.2.3.250308",
     "python-dotenv-vault>=0.6.4",
 ]
 lint = [
@@ -21,7 +22,11 @@ lint = [
 test = []
 docs = []
 
+[project.scripts]
+bot = "src/main:main"
+
 [tool.uv]
+package = true
 link-mode = "copy"
 default-groups = [
     "lint",
