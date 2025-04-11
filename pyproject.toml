@@ -61,3 +61,6 @@ exclude = [
 known-first-party = [
     "src",
 ]
+
+[tool.mypy]
+disable_error_code = ["import-untyped"]
