@@ -24,12 +24,12 @@ test = []
 docs = []
 
 [project.scripts]
-bot = "src/main:main"
-app = "src/app:main"
+#bot = "src/main:main"
+#app = "src/app:main"
 
 [tool.uv]
-#package = true
-#link-mode = "copy"
+package = false
+link-mode = "copy"
 default-groups = [
     "lint",
     "test",
@@ -66,3 +66,7 @@ known-first-party = [
 
 [tool.mypy]
 disable_error_code = ["import-untyped"]
+
+#[build-system]
+#requires = ["hatchling"]
+#build-backend = "hatchling.build"
