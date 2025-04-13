@@ -1,15 +1,27 @@
-import os
 from datetime import datetime
+
 import pandas as pd
 from binance.websocket.spot.websocket_api import SpotWebsocketAPIClient
 from dotenv_vault import load_dotenv
 from lightweight_charts import Chart
 
 # Загружаем конфигурацию
-load_dotenv()
+load_dotenv(__name__)
 
 
 class BinanceChart:
+    """A class for handling real-time Binance cryptocurrency chart data.
+
+    This class manages WebSocket connections to Binance's API to receive live
+    candlestick (kline) data and displays it using a lightweight chart interface.
+
+    Attributes:
+        symbol (str): Trading pair symbol (default: 'BTCUSDT')
+        interval (str): Candlestick interval (default: '1m')
+        chart: Chart instance for data visualization
+        df: Pandas DataFrame storing historical price data
+        ws_client: Binance WebSocket API client
+    """
     def __init__(self, symbol="BTCUSDT", interval="1m"):
         self.symbol = symbol
         self.interval = interval

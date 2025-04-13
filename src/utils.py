@@ -10,7 +10,7 @@ position sizing, risk management, and data processing.
 import math
 from datetime import datetime, timedelta
 
-from logger import get_logger
+from .logger import get_logger
 
 
 def calculate_position_size(balance: float, price: float, risk_percent: float) -> float:
@@ -24,7 +24,7 @@ def calculate_position_size(balance: float, price: float, risk_percent: float) -
     Returns:
         float: Position size in quote currency
     """
-    logger = get_logger()
+    logger = get_logger(__name__)
     logger.debug(
         "Calculating position size: balance=%s, price=%s, risk=%s", balance, price, risk_percent
     )

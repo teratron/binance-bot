@@ -17,7 +17,7 @@ from binance.error import ServerError, WebsocketClientError  # type: ignore
 from binance.spot import Spot  # type: ignore
 from dotenv_vault import load_dotenv  # type: ignore
 
-from config import (
+from .config import (
     MAX_POSITION_SIZE,
     MODE_BACKTEST,
     MODE_LIVE,
@@ -27,12 +27,12 @@ from config import (
     QQE_SLOW_PERIOD,
     QQE_SMOOTHING_PERIOD,
 )
-from indicators import QQEIndicator
-from logger import get_logger
-from utils import calculate_position_size
+from .indicators import QQEIndicator
+from .logger import get_logger
+from .utils import calculate_position_size
 
 # Load environment variables
-load_dotenv()
+load_dotenv(__name__)
 
 
 class TradingBot:

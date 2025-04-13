@@ -17,8 +17,8 @@ import logging
 #project_root = Path(__file__).parent.parent
 #sys.path.insert(0, str(project_root))
 #if sys.path[0] == str(project_root):
-from bot import TradingBot
-from config import (
+from .bot import TradingBot
+from .config import (
     DEFAULT_MODE,
     DEFAULT_TIMEFRAME,
     LOG_LEVEL,
@@ -27,7 +27,7 @@ from config import (
     MODE_PAPER,
     TRADING_PAIRS,
 )
-from logger import setup_logger
+from .logger import setup_logger
 
 
 def parse_arguments() -> argparse.Namespace:

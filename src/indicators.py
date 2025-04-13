@@ -35,7 +35,7 @@ class QQEIndicator:
         self.smoothing_period = smoothing_period
         self.fast_period = fast_period
         self.slow_period = slow_period
-        self.logger = get_logger()
+        self.logger = get_logger(__name__)
 
     def calculate(self, data):
         """Calculate QQE indicator values.
