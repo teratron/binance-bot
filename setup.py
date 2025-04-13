@@ -14,29 +14,42 @@ from pathlib import Path
 from typing import Any
 
 
-def get_list_commands(source: str | list[str], *args: str | list[str]) -> list[str]:
-    """Get a list of commands."""
+def build_command_list(source: str | list[str], *args: str | list[str]) -> list[str]:
+    """Build a unified command list from various input formats.
+
+    Examples:
+        >>> build_command_list("uv add", "package")
+        >>> build_command_list(["uv", "add"], "package")
+        >>> build_command_list("uv", ["add", "package"], "--dev")
+    """
 
     command: list[str] = []
-    if args:
-        command = list(args)
+
+    # Process args parameter
+    for arg in args:
+        if isinstance(arg, list):
+            command.extend(arg)
+        elif isinstance(arg, str):
+            command.append(arg)
+
+    # Process source parameter
     if isinstance(source, list):
-        if args:
-            source.extend(args)
-        return source
-    if isinstance(source, str):
+        command.extend(source)
+    elif isinstance(source, str):
         source = source.strip()
         if " " in source:
             command.extend(source.split(" "))
         else:
             command.append(source)
+
     return command
 
 
 def check_existing(service: str | list[str], *args: str | list[str], **kwargs: Any) -> bool:
     """Check if a service with the given name is already running."""
+
     try:
-        subprocess.run(get_list_commands(service, *args), **kwargs)
+        subprocess.run(build_command_list(service, *args), check=True, **kwargs)
         return True
     except (subprocess.SubprocessError, FileNotFoundError):
         return False
@@ -44,7 +57,8 @@ def check_existing(service: str | list[str], *args: str | list[str], **kwargs: A
 
 def check_uv_installed() -> bool:
     """Check if UV package manager is installed."""
-    if check_existing(["uv", "version"], capture_output=True, check=True):
+
+    if check_existing(["uv", "version"], capture_output=True):
         return True
 
     match sys.platform:
@@ -70,12 +84,14 @@ def install_dependencies() -> None:
     # Install packages
     packages: list[str | list[str]] = [
         "binance-connector",
+        "lightweight-charts",
         "ta-lib",
         # pylint: disable=line-too-long
         "https://github.com/cgohlke/talib-build/releases/download/v0.6.3/ta_lib-0.6.3-cp311-cp311-win_amd64.whl",
         "numpy",
         "pandas",
-        ["--dev", "python-dotenv-vault"],
+        "--dev pandas-stubs",
+        "--dev python-dotenv-vault",
         ["--dev", "mypy"],
         "--group lint ruff",
     ]
@@ -83,7 +99,7 @@ def install_dependencies() -> None:
     try:
         for package in packages:
             print(f"Installing {package}...")
-            _ = check_existing(["uv", "add"], package, check=True)
+            _ = check_existing(["uv", "add"], package)
 
         print("Dependencies installed successfully!")
     except subprocess.SubprocessError as e:
