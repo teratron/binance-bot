@@ -32,7 +32,7 @@ TIMEFRAMES = {
 }
 
 # Default timeframe for analysis
-DEFAULT_TIMEFRAME = TIMEFRAMES["5m"]
+DEFAULT_TIMEFRAME = TIMEFRAMES["1m"]
 
 # Backtesting parameters
 BACKTEST_START_DATE = "2025-01-01"  # Start date for backtesting
