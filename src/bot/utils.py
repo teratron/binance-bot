@@ -10,7 +10,7 @@ position sizing, risk management, and data processing.
 import math
 from datetime import datetime, timedelta
 
-from logger import get_logger
+from src.logger import get_logger
 
 
 def calculate_position_size(balance: float, price: float, risk_percent: float) -> float:
@@ -96,7 +96,7 @@ def format_number(number: float, precision: int = 8) -> float:
     Returns:
         float: Formatted number
     """
-    factor = 10**precision
+    factor = 10 ** precision
     return math.floor(number * factor) / factor
 
 

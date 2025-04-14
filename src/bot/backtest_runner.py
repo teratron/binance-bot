@@ -15,7 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, TypedDict, cast
 
-from src.backtest import run_backtest
+from backtest import run_backtest
 from src.config import (
     BACKTEST_END_DATE,
     BACKTEST_START_DATE,

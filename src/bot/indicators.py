@@ -9,8 +9,9 @@ including the QQE (Quantitative Qualitative Estimation) indicator.
 """
 
 import numpy as np
-from logger import get_logger
 from talib import EMA, RSI
+
+from src.logger import get_logger
 
 
 class QQEIndicator:
@@ -81,10 +82,10 @@ class QQEIndicator:
                 # Initialize first value
                 df.loc[df.index[i], "qqe_value"] = df.loc[df.index[i], "smoothed_rsi"]
                 df.loc[df.index[i], "long_band"] = (
-                    df.loc[df.index[i], "smoothed_rsi"] - df.loc[df.index[i], "slow_band"]
+                        df.loc[df.index[i], "smoothed_rsi"] - df.loc[df.index[i], "slow_band"]
                 )
                 df.loc[df.index[i], "short_band"] = (
-                    df.loc[df.index[i], "smoothed_rsi"] + df.loc[df.index[i], "slow_band"]
+                        df.loc[df.index[i], "smoothed_rsi"] + df.loc[df.index[i], "slow_band"]
                 )
             else:
                 # Get previous values

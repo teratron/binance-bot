@@ -15,7 +15,11 @@ from datetime import datetime
 import pandas as pd
 from binance.error import ServerError, WebsocketClientError  # type: ignore
 from binance.spot import Spot  # type: ignore
-from config import (
+from dotenv_vault import load_dotenv  # type: ignore
+
+from src.bot.indicators import QQEIndicator
+from src.bot.utils import calculate_position_size
+from src.config import (
     MAX_POSITION_SIZE,
     MODE_BACKTEST,
     MODE_LIVE,
@@ -25,14 +29,10 @@ from config import (
     QQE_SLOW_PERIOD,
     QQE_SMOOTHING_PERIOD,
 )
-from dotenv_vault import load_dotenv  # type: ignore
-from logger import get_logger
-
-from indicators import QQEIndicator
-from utils import calculate_position_size
+from src.logger import get_logger
 
 # Load environment variables
-load_dotenv(__name__)
+load_dotenv()
 
 
 class TradingBot:

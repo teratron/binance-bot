@@ -14,8 +14,7 @@ import pandas as pd
 from binance.error import ServerError, WebsocketClientError
 from binance.spot import Spot
 
-from src.bot.indicators import QQEIndicator
-from src.bot.utils import calculate_position_size
+from indicators import QQEIndicator
 from src.config import (
     ALLOW_SHORT_SELLING,
     MAX_POSITION_SIZE,
@@ -25,6 +24,7 @@ from src.config import (
     QQE_SMOOTHING_PERIOD,
 )
 from src.logger import get_logger
+from utils import calculate_position_size
 
 
 class Backtester:
@@ -183,11 +183,11 @@ class Backtester:
                 # Add unrealized profit/loss if in a position
                 if self.position["side"] == "buy":
                     equity += self.position["size"] * (
-                        current["close"] - self.position["entry_price"]
+                            current["close"] - self.position["entry_price"]
                     )
                 else:  # sell
                     equity += self.position["size"] * (
-                        self.position["entry_price"] - current["close"]
+                            self.position["entry_price"] - current["close"]
                     )
 
             self.equity_curve.append({"timestamp": current["timestamp"], "equity": equity})
@@ -282,9 +282,9 @@ class Backtester:
             "exit_time": timestamp,
             "profit_loss": profit_loss,
             "profit_loss_percent": (
-                profit_loss / (self.position["entry_price"] * self.position["size"])
-            )
-            * 100,
+                                           profit_loss / (self.position["entry_price"] * self.position["size"])
+                                   )
+                                   * 100,
         }
 
         self.trades.append(trade)
