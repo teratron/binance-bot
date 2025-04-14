@@ -11,14 +11,7 @@ It initializes the bot with configuration settings and starts the trading proces
 import argparse
 import logging
 
-#import sys
-#from pathlib import Path
-# Add the project root to the Python path before any imports
-#project_root = Path(__file__).parent.parent
-#sys.path.insert(0, str(project_root))
-#if sys.path[0] == str(project_root):
-from .bot import TradingBot
-from .config import (
+from config import (
     DEFAULT_MODE,
     DEFAULT_TIMEFRAME,
     LOG_LEVEL,
@@ -27,7 +20,14 @@ from .config import (
     MODE_PAPER,
     TRADING_PAIRS,
 )
-from .logger import setup_logger
+from logger import setup_logger
+# import sys
+# from pathlib import Path
+# Add the project root to the Python path before any imports
+# project_root = Path(__file__).parent.parent
+# sys.path.insert(0, str(project_root))
+# if sys.path[0] == str(project_root):
+from src.bot.bot import TradingBot
 
 
 def parse_arguments() -> argparse.Namespace:

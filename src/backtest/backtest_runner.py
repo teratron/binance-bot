@@ -15,15 +15,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, TypedDict, cast
 
-from .backtest import run_backtest
-from .config import (
+from src.backtest import run_backtest
+from src.config import (
     BACKTEST_END_DATE,
     BACKTEST_START_DATE,
     DEFAULT_TIMEFRAME,
     LOG_LEVEL,
     TRADING_PAIRS,
 )
-from .logger import setup_logger
+from src.logger import setup_logger
 
 
 # Define TypedDict classes for backtest results structure

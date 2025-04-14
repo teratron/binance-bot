@@ -6,7 +6,7 @@ from dotenv_vault import load_dotenv
 from lightweight_charts import Chart
 
 # Загружаем конфигурацию
-load_dotenv(__name__)
+load_dotenv()
 
 
 class BinanceChart:

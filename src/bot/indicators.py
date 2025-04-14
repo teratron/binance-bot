@@ -9,9 +9,8 @@ including the QQE (Quantitative Qualitative Estimation) indicator.
 """
 
 import numpy as np
-from talib import EMA, RSI
-
 from logger import get_logger
+from talib import EMA, RSI
 
 
 class QQEIndicator:
@@ -35,7 +34,7 @@ class QQEIndicator:
         self.smoothing_period = smoothing_period
         self.fast_period = fast_period
         self.slow_period = slow_period
-        self.logger = get_logger(__name__)
+        self.logger = get_logger()
 
     def calculate(self, data):
         """Calculate QQE indicator values.
@@ -241,7 +240,7 @@ class VolumeProfile:
 
             volume_profile[bin_mid] = bin_volume
 
-        # Find point of control (price level with highest volume)
+        # Find point of control (price level with the highest volume)
         poc_price = max(volume_profile, key=volume_profile.get)
         poc_volume = volume_profile[poc_price]
 
