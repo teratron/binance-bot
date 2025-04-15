@@ -17,9 +17,7 @@ from binance.error import ServerError, WebsocketClientError  # type: ignore
 from binance.spot import Spot  # type: ignore
 from dotenv_vault import load_dotenv  # type: ignore
 
-from src.bot.indicators import QQEIndicator
-from src.bot.utils import calculate_position_size
-from src.config import (
+from ..config import (
     MAX_POSITION_SIZE,
     MODE_BACKTEST,
     MODE_LIVE,
@@ -29,7 +27,9 @@ from src.config import (
     QQE_SLOW_PERIOD,
     QQE_SMOOTHING_PERIOD,
 )
-from src.logger import get_logger
+from ..logger import get_logger
+from .indicators import QQEIndicator
+from .utils import calculate_position_size
 
 # Load environment variables
 load_dotenv()
@@ -56,6 +56,7 @@ class TradingBot:
             timeframe (str): Timeframe for analysis (e.g., 15m, 1h)
             mode (str): Trading mode (backtest, paper, live)
         """
+
         self.logger = get_logger()
         self.trading_pair = trading_pair
         self.timeframe = timeframe
@@ -76,6 +77,7 @@ class TradingBot:
 
     def _init_binance_client(self):
         """Initialize Binance API client."""
+
         api_key = os.getenv("BINANCE_API_KEY")
         api_secret = os.getenv("BINANCE_API_SECRET")
         base_url = os.getenv("BINANCE_BASE_URL")
@@ -101,6 +103,7 @@ class TradingBot:
         Returns:
             pandas.DataFrame: DataFrame with historical data.
         """
+
         self.logger.info(
             "Fetching historical data for %s on %s timeframe", self.trading_pair, self.timeframe
         )
@@ -152,6 +155,7 @@ class TradingBot:
         Returns:
             dict: Analysis results and trading signals
         """
+
         self.logger.info("Analyzing market data")
 
         # Apply QQE indicator
@@ -189,6 +193,7 @@ class TradingBot:
         Returns:
             dict: Trade execution details
         """
+
         if self.mode == MODE_BACKTEST:
             return self._simulate_trade(signal, price)
         elif self.mode == MODE_PAPER:
@@ -209,6 +214,7 @@ class TradingBot:
         Returns:
             dict: Trade simulation details
         """
+
         self.logger.info("Simulating %s trade at price %s", signal, price)
 
         # Implement backtesting logic here
@@ -236,6 +242,7 @@ class TradingBot:
         Returns:
             dict: Paper trade details
         """
+
         self.logger.info("Paper trading: %s at price %s", signal, price)
 
         # Get account balance (in paper trading, we can simulate this)
@@ -291,6 +298,7 @@ class TradingBot:
         Returns:
             dict: Live trade details
         """
+
         self.logger.info("Live trading: %s signal at price %s", signal, price)
 
         try:
@@ -384,6 +392,7 @@ class TradingBot:
 
     def run(self):
         """Run the trading bot."""
+
         self.logger.info("Starting trading bot in %s mode", self.mode)
         self.running = True
 
@@ -441,6 +450,7 @@ class TradingBot:
         Returns:
             int: Sleep time in seconds
         """
+
         # Map timeframes to seconds
         timeframe_seconds = {
             "1m": 60,
@@ -467,5 +477,6 @@ class TradingBot:
 
     def stop(self):
         """Stop the trading bot."""
+
         self.logger.info("Stopping trading bot")
         self.running = False

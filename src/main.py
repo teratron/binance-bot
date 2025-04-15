@@ -11,6 +11,9 @@ It initializes the bot with configuration settings and starts the trading proces
 import argparse
 import logging
 
+from binance.spot import Spot  # type: ignore
+from binance.websocket.spot.websocket_stream import BinanceWebsocketClient, SpotWebsocketStreamClient  # type: ignore
+
 from config import (
     DEFAULT_MODE,
     DEFAULT_TIMEFRAME,
@@ -18,8 +21,7 @@ from config import (
     MODE_BACKTEST,
     MODE_LIVE,
     MODE_PAPER,
-    TRADING_PAIRS,
-)
+    TRADING_PAIRS, )
 from logger import setup_logger
 # import sys
 # from pathlib import Path
@@ -27,11 +29,12 @@ from logger import setup_logger
 # project_root = Path(__file__).parent.parent
 # sys.path.insert(0, str(project_root))
 # if sys.path[0] == str(project_root):
-from src.bot.bot import TradingBot
+from bot.bot import TradingBot
 
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments."""
+
     parser = argparse.ArgumentParser(description="Binance Trading Bot")
     parser.add_argument(
         "--mode",
@@ -64,6 +67,7 @@ def parse_arguments() -> argparse.Namespace:
 
 def main() -> None:
     """Main entry point for the trading bot."""
+
     # Parse command line arguments
     args: argparse.Namespace = parse_arguments()
 
@@ -90,3 +94,19 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    # api_key = os.getenv("BINANCE_API_KEY")
+    # api_secret = os.getenv("BINANCE_API_SECRET")
+    # base_url = os.getenv("BINANCE_BASE_URL")
+    # client = Spot(api_key=api_key, api_secret=api_secret, base_url=base_url)
+    # order = client.new_order(
+    #     symbol="BTCUSDT",
+    #     side="BUY",
+    #     type="MARKET",
+    #     quoteOrderQty=MAX_POSITION_SIZE,  # Amount in base currency
+    # )
+    # client = API(api_key=api_key, api_secret=api_secret, base_url=base_url)
+    # client = SpotWebsocketStreamClient()
+    # client.ping()
+    # client.kline(symbol="BTCUSDT", interval="1m")
+    # print(client)
+    # client.stop()

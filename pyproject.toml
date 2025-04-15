@@ -24,8 +24,8 @@ test = []
 docs = []
 
 [project.scripts]
-#bot = "src/main:main"
-#app = "src/app:main"
+bot = "src/main:main"
+#app = "src/app/app:main"
 
 [tool.uv]
 package = false

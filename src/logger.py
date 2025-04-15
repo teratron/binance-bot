@@ -16,7 +16,7 @@ from typing import Optional
 
 from dotenv_vault import load_dotenv
 
-from src.config import (
+from config import (
     LOG_BACKUP_COUNT,
     LOG_FILE,
     LOG_FORMAT,
