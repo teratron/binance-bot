@@ -5,7 +5,7 @@ echo "--- post-merge ---"
 npx dotenv-vault@latest pull
 
 # UV
-.venv/Scripts/activate
+.venv\Scripts\activate
 uv lock
 uv sync
 uv self update
