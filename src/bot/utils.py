@@ -111,16 +111,17 @@ def get_timeframe_delta(timeframe: str) -> timedelta:
     unit = timeframe[-1]
     value = int(timeframe[:-1])
 
-    if unit == "m":
-        return timedelta(minutes=value)
-    elif unit == "h":
-        return timedelta(hours=value)
-    elif unit == "d":
-        return timedelta(days=value)
-    elif unit == "w":
-        return timedelta(weeks=value)
-    else:
-        raise ValueError(f"Unknown timeframe unit: {unit}")
+    match unit:
+        case "m":
+            return timedelta(minutes=value)
+        case "h":
+            return timedelta(hours=value)
+        case "d":
+            return timedelta(days=value)
+        case "w":
+            return timedelta(weeks=value)
+        case _:
+            raise ValueError(f"Unknown timeframe unit: {unit}")
 
 
 def get_next_candle_time(timeframe: str) -> datetime:

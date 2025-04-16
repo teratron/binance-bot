@@ -10,6 +10,14 @@ dependencies = [
     "pandas>=2.2.3",
     "ta-lib==0.6.3",
 ]
+#exclude = [
+#    "tests",
+#    "docs",
+#    "examples",
+#    ".githooks",
+#    ".gitignore",
+#    ".gitattributes"
+#]
 
 [dependency-groups]
 dev = [
@@ -24,7 +32,7 @@ test = []
 docs = []
 
 [project.scripts]
-bot = "src/main:main"
+#bot = "src/main:main"
 #app = "src/app/app:main"
 
 [tool.uv]
@@ -62,6 +70,7 @@ exclude = [
 [tool.ruff.isort]
 known-first-party = [
     "src",
+    "bot",
 ]
 
 [tool.mypy]

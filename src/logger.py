@@ -26,18 +26,18 @@ from src.config import (
 load_dotenv()
 
 
-def setup_logger(log_level: str | None = None) -> logging.Logger:
+def setup_logger(level: str | None = None) -> logging.Logger:
     """Set up and configure the logger.
 
     Args:
-        log_level (str, optional): Logging level. Defaults to None.
+        level (str, optional): Logging level. Defaults to None.
 
     Returns:
         logging.Logger: Configured logger instance.
     """
     # Get log level from environment or config
-    if log_level is None:
-        log_level = os.getenv("LOG_LEVEL", LOG_LEVEL)
+    if level is None:
+        level = os.getenv("LOG_LEVEL", LOG_LEVEL)
 
     # Create logs directory if it doesn't exist
     log_dir: Path = Path("logs")
@@ -45,7 +45,7 @@ def setup_logger(log_level: str | None = None) -> logging.Logger:
 
     # Configure logger
     logger = logging.getLogger("binance_bot")
-    logger.setLevel(getattr(logging, log_level))
+    logger.setLevel(getattr(logging, level))
 
     # Clear existing handlers to avoid duplicate logs
     if logger.handlers:

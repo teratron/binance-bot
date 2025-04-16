@@ -45,7 +45,6 @@ class TradingBot:
         positions: Dictionary tracking open positions
         qqe: QQE indicator instance
     """
-
     def __init__(self, trading_pair, timeframe, mode):
         """Initialize the trading bot.
 

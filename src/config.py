@@ -12,7 +12,7 @@ LOG_FORMAT = os.getenv("LOG_FORMAT")  # Log format
 LOG_CONFIG = os.getenv("LOG_CONFIG")  # Log configuration file name
 LOG_FILE = os.getenv("LOG_FILE")  # Log file name
 LOG_MAX_SIZE = int(os.getenv("LOG_MAX_SIZE"))  # Maximum log file size (10 * 1024 * 1024 = 10 MB)
-LOG_BACKUP_COUNT = os.getenv("LOG_BACKUP_COUNT")  # Number of backup log files
+LOG_BACKUP_COUNT = int(os.getenv("LOG_BACKUP_COUNT"))  # Number of backup log files
 
 # Binance
 BINANCE_API_KEY = os.getenv("BINANCE_API_KEY")
@@ -51,7 +51,7 @@ TIMEFRAMES = {
 }
 
 # Default timeframe for analysis
-DEFAULT_TIMEFRAME = TIMEFRAMES["1m"]
+DEFAULT_TIMEFRAME = TIMEFRAMES["5m"]
 
 # Backtesting parameters
 BACKTEST_START_DATE = "2025-01-01"  # Start date for backtesting
