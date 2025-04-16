@@ -7,7 +7,6 @@ Binance Trading Bot with QQE Indicator
 This is the main entry point for the trading bot application.
 It initializes the bot with configuration settings and starts the trading process.
 """
-
 import argparse
 import logging
 
@@ -35,7 +34,6 @@ from src.logger import setup_logger
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments."""
-
     parser = argparse.ArgumentParser(description="Binance Trading Bot")
     parser.add_argument(
         "--mode",
@@ -68,7 +66,6 @@ def parse_arguments() -> argparse.Namespace:
 
 def main() -> None:
     """Main entry point for the trading bot."""
-
     # Parse command line arguments
     args: argparse.Namespace = parse_arguments()
 

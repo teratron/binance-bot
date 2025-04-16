@@ -7,7 +7,6 @@ Backtest Runner for Binance Trading Bot.
 This script provides a command-line interface for running backtests
 of the QQE trading strategy on historical Binance data.
 """
-
 import argparse
 import json
 import logging
@@ -29,7 +28,6 @@ from src.logger import setup_logger
 # Define TypedDict classes for backtest results structure
 class TradeDict(TypedDict):
     """Type definition for a trade record."""
-
     side: str
     entry_price: float
     exit_price: float
@@ -42,14 +40,12 @@ class TradeDict(TypedDict):
 
 class EquityPointDict(TypedDict):
     """Type definition for an equity curve point."""
-
     timestamp: datetime
     equity: float
 
 
 class BacktestResultsDict(TypedDict):
     """Type definition for backtest results."""
-
     initial_balance: float
     final_balance: float
     total_return: float
@@ -66,7 +62,6 @@ class BacktestResultsDict(TypedDict):
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments."""
-
     parser = argparse.ArgumentParser(description="Backtest Runner for Binance Trading Bot")
     parser.add_argument(
         "--pair",
@@ -115,7 +110,6 @@ def parse_arguments() -> argparse.Namespace:
 
 def main() -> None:
     """Main entry point for the backtest runner."""
-
     # Parse command line arguments
     args: argparse.Namespace = parse_arguments()
 

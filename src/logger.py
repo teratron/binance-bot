@@ -6,7 +6,6 @@
 This module provides logging functionality for the trading bot,
 including console and file logging with rotation.
 """
-
 import logging
 import os
 import sys
@@ -36,7 +35,6 @@ def setup_logger(log_level: str | None = None) -> logging.Logger:
     Returns:
         logging.Logger: Configured logger instance.
     """
-
     # Get log level from environment or config
     if log_level is None:
         log_level = os.getenv("LOG_LEVEL", LOG_LEVEL)
@@ -60,6 +58,7 @@ def setup_logger(log_level: str | None = None) -> logging.Logger:
     console_handler = logging.StreamHandler(stream=sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
+    # console_handler.close()
 
     # Create file handler with rotation
     file_handler = RotatingFileHandler(
@@ -70,6 +69,7 @@ def setup_logger(log_level: str | None = None) -> logging.Logger:
     )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
+    #file_handler.close()
 
     return logger
 
@@ -83,5 +83,4 @@ def get_logger(name: str | None = None) -> logging.Logger:
     Returns:
         logging.Logger: Logger instance.
     """
-
     return logging.getLogger(name)

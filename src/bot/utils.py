@@ -6,7 +6,6 @@
 This module provides helper functions for various tasks such as
 position sizing, risk management, and data processing.
 """
-
 import math
 from datetime import datetime, timedelta
 
@@ -109,7 +108,6 @@ def get_timeframe_delta(timeframe: str) -> timedelta:
     Returns:
         timedelta: Equivalent timedelta object
     """
-
     unit = timeframe[-1]
     value = int(timeframe[:-1])
 
@@ -134,7 +132,6 @@ def get_next_candle_time(timeframe: str) -> datetime:
     Returns:
         datetime: Timestamp of the next candle
     """
-
     now = datetime.now()
     _delta = get_timeframe_delta(timeframe)
 
@@ -170,10 +167,9 @@ def calculate_sleep_time(timeframe: str) -> float:
     Returns:
         float: Sleep time in seconds
     """
-
     next_candle = get_next_candle_time(timeframe)
     now = datetime.now()
-    sleep_seconds = (next_candle - now).total_seconds()
+    sleep_seconds = int((next_candle - now).total_seconds())
 
     # Add a small buffer to ensure we're past the candle close
     sleep_seconds += 1
