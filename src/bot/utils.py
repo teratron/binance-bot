@@ -24,7 +24,7 @@ def calculate_position_size(balance: float, price: float, risk_percent: float) -
     Returns:
         float: Position size in quote currency
     """
-    logger = get_logger()
+    logger = get_logger(__name__)
     logger.debug(
         "Calculating position size: balance=%s, price=%s, risk=%s", balance, price, risk_percent
     )
@@ -53,7 +53,7 @@ def calculate_stop_loss(entry_price: float, side: str, stop_loss_percent: float)
     Returns:
         float: Stop loss price
     """
-    logger = get_logger()
+    logger = get_logger(__name__)
 
     if side.lower() == "buy":
         stop_loss = entry_price * (1 - stop_loss_percent)
@@ -75,7 +75,7 @@ def calculate_take_profit(entry_price: float, side: str, take_profit_percent: fl
     Returns:
         float: Take profit price
     """
-    logger = get_logger()
+    logger = get_logger(__name__)
 
     if side.lower() == "buy":
         take_profit = entry_price * (1 + take_profit_percent)
@@ -109,6 +109,7 @@ def get_timeframe_delta(timeframe: str) -> timedelta:
     Returns:
         timedelta: Equivalent timedelta object
     """
+
     unit = timeframe[-1]
     value = int(timeframe[:-1])
 
@@ -133,6 +134,7 @@ def get_next_candle_time(timeframe: str) -> datetime:
     Returns:
         datetime: Timestamp of the next candle
     """
+
     now = datetime.now()
     _delta = get_timeframe_delta(timeframe)
 
@@ -168,6 +170,7 @@ def calculate_sleep_time(timeframe: str) -> float:
     Returns:
         float: Sleep time in seconds
     """
+
     next_candle = get_next_candle_time(timeframe)
     now = datetime.now()
     sleep_seconds = (next_candle - now).total_seconds()

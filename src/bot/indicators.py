@@ -35,7 +35,7 @@ class QQEIndicator:
         self.smoothing_period = smoothing_period
         self.fast_period = fast_period
         self.slow_period = slow_period
-        self.logger = get_logger()
+        self.logger = get_logger(__name__)
 
     def calculate(self, data):
         """Calculate QQE indicator values.
@@ -154,7 +154,7 @@ class EMACrossover:
         """
         self.fast_period = fast_period
         self.slow_period = slow_period
-        self.logger = get_logger()
+        self.logger = get_logger(__name__)
 
     def calculate(self, data):
         """Calculate EMA Crossover indicator values.
@@ -203,7 +203,7 @@ class VolumeProfile:
         """
         self.num_bins = num_bins
         self.lookback_period = lookback_period
-        self.logger = get_logger()
+        self.logger = get_logger(__name__)
 
     def calculate(self, data):
         """Calculate Volume Profile indicator values.

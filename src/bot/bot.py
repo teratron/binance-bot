@@ -7,8 +7,6 @@ Core Trading Bot implementation.
 This module contains the main TradingBot class that handles
 connection to Binance API, market data processing, and trade execution.
 """
-
-import os
 import time
 from datetime import datetime
 
@@ -27,7 +25,7 @@ from src.config import (
     QQE_FAST_PERIOD,
     QQE_RSI_PERIOD,
     QQE_SLOW_PERIOD,
-    QQE_SMOOTHING_PERIOD,
+    QQE_SMOOTHING_PERIOD, BINANCE_API_KEY, BINANCE_API_SECRET, BINANCE_BASE_URL,
 )
 from src.logger import get_logger
 
@@ -56,8 +54,7 @@ class TradingBot:
             timeframe (str): Timeframe for analysis (e.g., 15m, 1h)
             mode (str): Trading mode (backtest, paper, live)
         """
-
-        self.logger = get_logger()
+        self.logger = get_logger(__name__)
         self.trading_pair = trading_pair
         self.timeframe = timeframe
         self.mode = mode
@@ -77,10 +74,9 @@ class TradingBot:
 
     def _init_binance_client(self):
         """Initialize Binance API client."""
-
-        api_key = os.getenv("BINANCE_API_KEY")
-        api_secret = os.getenv("BINANCE_API_SECRET")
-        base_url = os.getenv("BINANCE_BASE_URL")
+        api_key = BINANCE_API_KEY
+        api_secret = BINANCE_API_SECRET
+        base_url = BINANCE_BASE_URL
 
         if self.mode == MODE_LIVE and (not api_key or not api_secret):
             self.logger.error("API key and secret are required for live trading")
@@ -103,7 +99,6 @@ class TradingBot:
         Returns:
             pandas.DataFrame: DataFrame with historical data.
         """
-
         self.logger.info(
             "Fetching historical data for %s on %s timeframe", self.trading_pair, self.timeframe
         )
@@ -155,7 +150,6 @@ class TradingBot:
         Returns:
             dict: Analysis results and trading signals
         """
-
         self.logger.info("Analyzing market data")
 
         # Apply QQE indicator
@@ -193,7 +187,6 @@ class TradingBot:
         Returns:
             dict: Trade execution details
         """
-
         if self.mode == MODE_BACKTEST:
             return self._simulate_trade(signal, price)
         elif self.mode == MODE_PAPER:
@@ -214,7 +207,6 @@ class TradingBot:
         Returns:
             dict: Trade simulation details
         """
-
         self.logger.info("Simulating %s trade at price %s", signal, price)
 
         # Implement backtesting logic here
@@ -242,7 +234,6 @@ class TradingBot:
         Returns:
             dict: Paper trade details
         """
-
         self.logger.info("Paper trading: %s at price %s", signal, price)
 
         # Get account balance (in paper trading, we can simulate this)
@@ -298,7 +289,6 @@ class TradingBot:
         Returns:
             dict: Live trade details
         """
-
         self.logger.info("Live trading: %s signal at price %s", signal, price)
 
         try:
@@ -392,7 +382,6 @@ class TradingBot:
 
     def run(self):
         """Run the trading bot."""
-
         self.logger.info("Starting trading bot in %s mode", self.mode)
         self.running = True
 
@@ -450,7 +439,6 @@ class TradingBot:
         Returns:
             int: Sleep time in seconds
         """
-
         # Map timeframes to seconds
         timeframe_seconds = {
             "1m": 60,
@@ -477,6 +465,5 @@ class TradingBot:
 
     def stop(self):
         """Stop the trading bot."""
-
         self.logger.info("Stopping trading bot")
         self.running = False

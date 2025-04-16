@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-Logger module for the Binance Trading Bot.
+"""Logger module.
 
 This module provides logging functionality for the trading bot,
 including console and file logging with rotation.
@@ -10,9 +9,9 @@ including console and file logging with rotation.
 
 import logging
 import os
+import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Optional
 
 from dotenv_vault import load_dotenv
 
@@ -28,7 +27,7 @@ from src.config import (
 load_dotenv()
 
 
-def setup_logger(log_level: Optional[str] = None) -> logging.Logger:
+def setup_logger(log_level: str | None = None) -> logging.Logger:
     """Set up and configure the logger.
 
     Args:
@@ -58,7 +57,7 @@ def setup_logger(log_level: Optional[str] = None) -> logging.Logger:
     formatter = logging.Formatter(LOG_FORMAT)
 
     # Create console handler
-    console_handler = logging.StreamHandler()
+    console_handler = logging.StreamHandler(stream=sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
@@ -67,6 +66,7 @@ def setup_logger(log_level: Optional[str] = None) -> logging.Logger:
         log_dir / LOG_FILE,
         maxBytes=LOG_MAX_SIZE,
         backupCount=LOG_BACKUP_COUNT,
+        encoding="utf-8",
     )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
@@ -74,10 +74,14 @@ def setup_logger(log_level: Optional[str] = None) -> logging.Logger:
     return logger
 
 
-def get_logger() -> logging.Logger:
+def get_logger(name: str | None = None) -> logging.Logger:
     """Get the logger instance.
+
+    Args:
+        name (str, optional): Name of the logger. Defaults to None.
 
     Returns:
         logging.Logger: Logger instance.
     """
-    return logging.getLogger("binance_bot")
+
+    return logging.getLogger(name)
