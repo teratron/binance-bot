@@ -22,6 +22,7 @@ class BinanceChart:
         df: Pandas DataFrame storing historical price data
         ws_client: Binance WebSocket API client
     """
+
     def __init__(self, symbol="BTCUSDT", interval="1m"):
         self.symbol = symbol
         self.interval = interval

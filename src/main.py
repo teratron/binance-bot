@@ -14,22 +14,23 @@ import logging
 from binance.spot import Spot  # type: ignore
 from binance.websocket.spot.websocket_stream import BinanceWebsocketClient, SpotWebsocketStreamClient  # type: ignore
 
-from config import (
-    DEFAULT_MODE,
-    DEFAULT_TIMEFRAME,
-    LOG_LEVEL,
-    MODE_BACKTEST,
-    MODE_LIVE,
-    MODE_PAPER,
-    TRADING_PAIRS, )
-from logger import setup_logger
 # import sys
 # from pathlib import Path
 # Add the project root to the Python path before any imports
 # project_root = Path(__file__).parent.parent
 # sys.path.insert(0, str(project_root))
 # if sys.path[0] == str(project_root):
-from bot.bot import TradingBot
+from src.bot.bot import TradingBot
+from src.config import (
+    DEFAULT_MODE,
+    DEFAULT_TIMEFRAME,
+    LOG_LEVEL,
+    MODE_BACKTEST,
+    MODE_LIVE,
+    MODE_PAPER,
+    TRADING_PAIRS
+)
+from src.logger import setup_logger
 
 
 def parse_arguments() -> argparse.Namespace:

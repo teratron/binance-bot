@@ -16,7 +16,7 @@ from typing import Optional
 
 from dotenv_vault import load_dotenv
 
-from config import (
+from src.config import (
     LOG_BACKUP_COUNT,
     LOG_FILE,
     LOG_FORMAT,
@@ -37,6 +37,7 @@ def setup_logger(log_level: Optional[str] = None) -> logging.Logger:
     Returns:
         logging.Logger: Configured logger instance.
     """
+
     # Get log level from environment or config
     if log_level is None:
         log_level = os.getenv("LOG_LEVEL", LOG_LEVEL)

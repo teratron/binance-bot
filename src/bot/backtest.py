@@ -14,8 +14,9 @@ import pandas as pd
 from binance.error import ServerError, WebsocketClientError
 from binance.spot import Spot
 
-from .indicators import QQEIndicator
-from ..config import (
+from src.bot.indicators import QQEIndicator
+from src.bot.utils import calculate_position_size
+from src.config import (
     ALLOW_SHORT_SELLING,
     MAX_POSITION_SIZE,
     QQE_FAST_PERIOD,
@@ -23,8 +24,7 @@ from ..config import (
     QQE_SLOW_PERIOD,
     QQE_SMOOTHING_PERIOD,
 )
-from ..logger import get_logger
-from .utils import calculate_position_size
+from src.logger import get_logger
 
 
 class Backtester:
@@ -153,6 +153,7 @@ class Backtester:
         Returns:
             dict: Backtest results
         """
+
         self.logger.info("Starting backtest")
 
         # Fetch data if not provided
@@ -236,6 +237,7 @@ class Backtester:
             price (float): Entry price
             timestamp (datetime): Entry timestamp
         """
+
         # Calculate position size
         position_size = calculate_position_size(
             balance=self.balance,
@@ -307,6 +309,7 @@ class Backtester:
         Returns:
             dict: Backtest results
         """
+
         if not self.trades:
             return {
                 "initial_balance": self.initial_balance,
@@ -388,6 +391,7 @@ def run_backtest(trading_pair, timeframe, start_date, end_date=None, initial_bal
     Returns:
         dict: Backtest results
     """
+
     backtester = Backtester(
         trading_pair=trading_pair,
         timeframe=timeframe,
