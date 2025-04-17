@@ -11,6 +11,7 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from typing import Optional
 
 from dotenv_vault import load_dotenv
 
@@ -26,26 +27,26 @@ from src.config import (
 load_dotenv()
 
 
-def setup_logger(level: str | None = None) -> logging.Logger:
+def setup_logger(log_level: Optional[str] = None) -> logging.Logger:
     """Set up and configure the logger.
 
     Args:
-        level (str, optional): Logging level. Defaults to None.
+        log_level (str, optional): Logging level. Defaults to None.
 
     Returns:
         logging.Logger: Configured logger instance.
     """
     # Get log level from environment or config
-    if level is None:
-        level = os.getenv("LOG_LEVEL", LOG_LEVEL)
+    if log_level is None:
+        log_level = os.getenv("LOG_LEVEL", LOG_LEVEL)
 
     # Create logs directory if it doesn't exist
     log_dir: Path = Path("logs")
     log_dir.mkdir(exist_ok=True)
 
     # Configure logger
-    logger = logging.getLogger("binance_bot")
-    logger.setLevel(getattr(logging, level))
+    logger = get_logger("binance_bot")
+    logger.setLevel(getattr(logging, log_level))
 
     # Clear existing handlers to avoid duplicate logs
     if logger.handlers:
@@ -74,7 +75,7 @@ def setup_logger(level: str | None = None) -> logging.Logger:
     return logger
 
 
-def get_logger(name: str | None = None) -> logging.Logger:
+def get_logger(name: Optional[str] = None) -> logging.Logger:
     """Get the logger instance.
 
     Args:

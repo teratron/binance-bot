@@ -23,7 +23,7 @@ def calculate_position_size(balance: float, price: float, risk_percent: float) -
     Returns:
         float: Position size in quote currency
     """
-    logger = get_logger(__name__)
+    logger = get_logger("utils")
     logger.debug(
         "Calculating position size: balance=%s, price=%s, risk=%s", balance, price, risk_percent
     )
@@ -52,7 +52,7 @@ def calculate_stop_loss(entry_price: float, side: str, stop_loss_percent: float)
     Returns:
         float: Stop loss price
     """
-    logger = get_logger(__name__)
+    logger = get_logger("utils")
 
     if side.lower() == "buy":
         stop_loss = entry_price * (1 - stop_loss_percent)
@@ -74,7 +74,7 @@ def calculate_take_profit(entry_price: float, side: str, take_profit_percent: fl
     Returns:
         float: Take profit price
     """
-    logger = get_logger(__name__)
+    logger = get_logger("utils")
 
     if side.lower() == "buy":
         take_profit = entry_price * (1 + take_profit_percent)

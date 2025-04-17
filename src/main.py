@@ -9,15 +9,15 @@ It initializes the bot with configuration settings and starts the trading proces
 """
 import argparse
 import logging
+import sys
+from pathlib import Path
 
 from binance.spot import Spot  # type: ignore
-from binance.websocket.spot.websocket_stream import BinanceWebsocketClient, SpotWebsocketStreamClient  # type: ignore
 
-# import sys
-# from pathlib import Path
+# from binance.websocket.spot.websocket_stream import BinanceWebsocketClient, SpotWebsocketStreamClient  # type: ignore
 # Add the project root to the Python path before any imports
-# project_root = Path(__file__).parent.parent
-# sys.path.insert(0, str(project_root))
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 # if sys.path[0] == str(project_root):
 from src.bot.bot import TradingBot
 from src.config import (

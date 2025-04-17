@@ -25,7 +25,10 @@ from src.config import (
     QQE_FAST_PERIOD,
     QQE_RSI_PERIOD,
     QQE_SLOW_PERIOD,
-    QQE_SMOOTHING_PERIOD, BINANCE_API_KEY, BINANCE_API_SECRET, BINANCE_BASE_URL,
+    QQE_SMOOTHING_PERIOD,
+    BINANCE_API_KEY,
+    BINANCE_API_SECRET,
+    BINANCE_BASE_URL,
 )
 from src.logger import get_logger
 
@@ -45,6 +48,7 @@ class TradingBot:
         positions: Dictionary tracking open positions
         qqe: QQE indicator instance
     """
+
     def __init__(self, trading_pair, timeframe, mode):
         """Initialize the trading bot.
 
@@ -53,7 +57,7 @@ class TradingBot:
             timeframe (str): Timeframe for analysis (e.g., 15m, 1h)
             mode (str): Trading mode (backtest, paper, live)
         """
-        self.logger = get_logger(__name__)
+        self.logger = get_logger("bot")
         self.trading_pair = trading_pair
         self.timeframe = timeframe
         self.mode = mode

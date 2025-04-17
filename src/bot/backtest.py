@@ -40,7 +40,7 @@ class Backtester:
             end_date (str, optional): End date for backtesting (YYYY-MM-DD). Defaults to None (current date).
             initial_balance (float, optional): Initial balance for backtesting. Defaults to 1000.0.
         """
-        self.logger = get_logger(__name__)
+        self.logger = get_logger("backtest")
         self.trading_pair = trading_pair
         self.timeframe = timeframe
         self.start_date = datetime.strptime(start_date, "%Y-%m-%d")
