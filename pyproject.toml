@@ -31,7 +31,7 @@ lint = [
 test = []
 docs = []
 
-[project.scripts]
+#[project.scripts]
 #bot = "src/main:main"
 #app = "src/app/app:main"
 

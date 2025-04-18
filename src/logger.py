@@ -45,7 +45,7 @@ def setup_logger(log_level: Optional[str] = None) -> logging.Logger:
     log_dir.mkdir(exist_ok=True)
 
     # Configure logger
-    logger = get_logger("binance_bot")
+    logger = logging.getLogger("binance_bot")
     logger.setLevel(getattr(logging, log_level))
 
     # Clear existing handlers to avoid duplicate logs
@@ -75,7 +75,7 @@ def setup_logger(log_level: Optional[str] = None) -> logging.Logger:
     return logger
 
 
-def get_logger(name: Optional[str] = None) -> logging.Logger:
+def get_logger(name: Optional[str] = "binance_bot") -> logging.Logger:
     """Get the logger instance.
 
     Args:

@@ -57,7 +57,8 @@ class TradingBot:
             timeframe (str): Timeframe for analysis (e.g., 15m, 1h)
             mode (str): Trading mode (backtest, paper, live)
         """
-        self.logger = get_logger("bot")
+        # self.logger = get_logger("bot")
+        self.logger = get_logger()
         self.trading_pair = trading_pair
         self.timeframe = timeframe
         self.mode = mode
