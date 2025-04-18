@@ -24,6 +24,11 @@ TRADING_PAIRS = ["BTCUSDT", "ETHUSDT"]  # Trading pairs to monitor
 BASE_CURRENCY = "USDT"  # Base currency for trading
 QUOTE_CURRENCIES = ["BTC", "ETH"]  # Quote currencies for trading
 
+# Futures trading parameters
+FUTURES_TRADING_PAIRS = ["BTCUSD_PERP", "ETHUSD_PERP"]  # Coin-M futures trading pairs
+FUTURES_LEVERAGE = 5  # Default leverage for futures trading
+FUTURES_MARGIN_TYPE = "CROSSED"  # Default margin type (CROSSED or ISOLATED)
+
 # Position sizing and risk management
 MAX_POSITION_SIZE = 0.01  # Maximum position size as a fraction of available balance
 STOP_LOSS_PERCENT = 0.02  # Stop loss percentage
